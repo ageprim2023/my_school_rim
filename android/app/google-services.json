@@ -1,0 +1,47 @@
+{
+  "project_info": {
+    "project_number": "734677784635",
+    "project_id": "my-school-rim",
+    "storage_bucket": "my-school-rim.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:734677784635:android:ea58e9e683a540a006241e",
+        "android_client_info": {
+          "package_name": "mr.ageprim.my_school_rim"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "734677784635-toti472vhvqk9irbbrfhvnm892f9b13q.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "mr.ageprim.my_school_rim",
+            "certificate_hash": "c8cc7b120e18afcf146b9de8c82fb1708a53c9f1"
+          }
+        },
+        {
+          "client_id": "734677784635-hikmhr0bc1v3p9775grlrdne6ih1m4qh.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBEo17wzvvf_cbx0LNziv3EZwp2YVt75NU"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "734677784635-hikmhr0bc1v3p9775grlrdne6ih1m4qh.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

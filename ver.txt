@@ -1,0 +1,12 @@
+jiffy: ^4.0.0
+  image_picker: ^0.7.7
+  http: ^0.13.5
+  firebase_auth: ^4.2.10
+  firebase_core: ^2.7.1
+  firebase_storage: ^11.0.15
+  firebase_messaging: ^14.2.6
+  cloud_firestore: ^4.4.4
+  google_sign_in: ^6.0.2
+  awesome_dialog: ^3.0.2
+  dropdown_search: ^5.0.6
+  flutter_dropdown_alert: ^1.0.7
