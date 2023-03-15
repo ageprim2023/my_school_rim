@@ -51,7 +51,7 @@ class MyTextField extends StatelessWidget {
 class MyTextFormField extends StatelessWidget {
   final Widget prefix;
   final String labelText;
-  final Text suffix;
+  final Widget suffix;
   final TextEditingController controller;
   final bool enabled;
   final TextInputType keyboardType;

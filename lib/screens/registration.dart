@@ -1,7 +1,6 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:pinput/pinput.dart';
 import '../fonctions/fonctions.dart';
 import '../tools/styles.dart';
 import '../widgets/buttons.dart';
@@ -52,7 +51,13 @@ class _RegistrationState extends State<Registration> {
         setState(() {
           isLoading = false;
         });
-        myShowDialog(context, 'حدث خطأ أثناء التسجيل\n ${e.code}');
+        if (e.code == 'weak-password') {
+          myShowDialog(context, 'حبذا تغيير الرمز السري');
+        } else if (e.code == 'email-already-in-use') {
+          myShowDialog(context, 'الهاتف الشخصي مسجل سلفا');
+        } else {
+          myShowDialog(context, 'حدث خطأ أثناء التسجيل\n ${e.code}');
+        }
       } catch (r) {
         setState(() {
           isLoading = false;

@@ -47,8 +47,8 @@ class MyTextButton extends StatelessWidget {
   Widget build(BuildContext context) {
     return TextButton(
       onPressed: onPressed,
-      style: const ButtonStyle(
-        backgroundColor: MaterialStatePropertyAll(Colors.brown),
+      style: ButtonStyle(
+        backgroundColor: MaterialStatePropertyAll(colorGreen),
       ),
       child: Text(
         title,

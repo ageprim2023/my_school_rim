@@ -35,7 +35,7 @@ void main() async {
               )
             ],
           ),
-      initialRoute: Registration.root,
+      initialRoute: Login.root,
       routes: {
         Login.root: (context) => const Login(),
         Registration.root: (context) => const Registration(),
