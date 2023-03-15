@@ -1,7 +1,5 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_dropdown_alert/alert_controller.dart';
-import 'package:flutter_dropdown_alert/model/data_alert.dart';
 
 import '../fonctions/fonctions.dart';
 import '../tools/styles.dart';
@@ -21,12 +19,6 @@ class Login extends StatefulWidget {
   State<Login> createState() => _LoginState();
 }
 
-void _success(String message) {
-  Map<String, dynamic> payload = new Map<String, dynamic>();
-  payload["data"] = "content";
-  AlertController.show("", message, TypeAlert.success, payload);
-}
-
 class _LoginState extends State<Login> {
   bool isLoading = false;
   final phoneController = TextEditingController();
@@ -35,6 +27,8 @@ class _LoginState extends State<Login> {
   int numPhone = 0;
   GlobalKey<FormState> formState = GlobalKey<FormState>();
   bool isForget = false;
+  late String phoneNumber;
+  late String myverificationId;
 
   access() async {
     var formData = formState.currentState;
@@ -75,14 +69,14 @@ class _LoginState extends State<Login> {
   }
 
   forgetCode() async {
+    UserCredential userCredential;
     try {
       setState(() {
         isLoading = true;
       });
-      UserCredential userCredential = await FirebaseAuth.instance
-          .signInWithEmailAndPassword(
-              email: 'agep${phoneController.text}@gmail.com',
-              password: '@nrptSagep3344');
+      userCredential = await FirebaseAuth.instance.signInWithEmailAndPassword(
+          email: 'agep${phoneController.text}@gmail.com',
+          password: '@nrptSagep3344');
     } on FirebaseAuthException catch (e) {
       setState(() {
         isLoading = false;
@@ -91,10 +85,21 @@ class _LoginState extends State<Login> {
         myShowDialog(context, 'رقم الهاتف الشخصي الذي أدخلتم غير مسجل');
       } else if (e.code == 'wrong-password') {
         /////
-        setState(() {
-          isForget = true;
+        myShowDialogYesNo(context, '  هل حقا نسيتم الرمز السري خاصتكم؟',
+            () async {
+          Navigator.of(context).pop();
+          setState(() {
+            phoneNumber = '+222${phoneController.text}';
+          });
+          dropdownAlert(
+              'يتم الآن ارسال رسالة SMS إلى هاتفكم ${phoneController.text} يوجد بها رمز التحقق');
+          setState(() {
+            isForget = true;
+            isLoading = true;
+          });
+          await sendCode();
         });
-        _success('يتم الآن ارسال رسالة SMS إلى هاتفكم');
+        /////
       } else {
         myShowDialog(context, 'حدث خطأ أثناء محاولة الولوج\n ${e.code}');
       }
@@ -106,20 +111,49 @@ class _LoginState extends State<Login> {
     }
   }
 
-  verfied() async {
+  sendCode() async {
     try {
       await FirebaseAuth.instance.verifyPhoneNumber(
-        phoneNumber: '+222${phoneController.text}',
+        phoneNumber: phoneNumber,
         verificationCompleted: (PhoneAuthCredential credential) {},
         verificationFailed: (FirebaseAuthException e) {
           myShowDialog(context, '${e.message}');
-          //   myShowDialog(context,
-          //       'حدثت مشكلة أثناء الاتصال بالسيرفر، ربما تتعلق بمدى قوة الانترنت لديكم، يرجى إعادة المحاولة بعد دقائق');
-          //print('${e.message}');
         },
         codeSent: (String verificationId, int? resendToken) {
-          myShowDialog(context,
+          setState(() {
+            myverificationId = verificationId;
+            isLoading = false;
+          });
+          dropdownAlert(
               'تم ارسال رسالة SMS على رقم هاتفكم بها رمز التحقق، يرجى ادخاله في حقل رمز التحقق');
+        },
+        codeAutoRetrievalTimeout: (String verificationId) {},
+      );
+    } on FirebaseAuthException catch (e) {
+      myShowDialog(context, '${e.message}');
+    }
+  }
+
+  verifiedCode() async {
+    FirebaseAuth auth = FirebaseAuth.instance;
+    try {
+      await FirebaseAuth.instance.verifyPhoneNumber(
+        phoneNumber: phoneNumber,
+        verificationCompleted: (PhoneAuthCredential credential) {},
+        verificationFailed: (FirebaseAuthException e) {
+          myShowDialog(context, '${e.message}');
+        },
+        codeSent: (String verificationId, int? resendToken) async {
+          // Create a PhoneAuthCredential with the code
+          PhoneAuthCredential credential = PhoneAuthProvider.credential(
+              verificationId: verificationId, smsCode: smsController.text);
+
+          // Sign the user in (or link) with the credential
+          UserCredential user = await auth.signInWithCredential(credential);
+          if (user.user != null) {
+            // ignore: use_build_context_synchronously
+            myShowDialog(context, 'تم التحقق');
+          }
         },
         codeAutoRetrievalTimeout: (String verificationId) {},
       );
@@ -292,6 +326,7 @@ class _LoginState extends State<Login> {
                                   'ينبغي أن يتكون رمز التحقق من 6 أرقام');
                               return;
                             }
+                            verifiedCode();
                           },
                           color: colorGreen!,
                           minWidth: 100,

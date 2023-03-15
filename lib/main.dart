@@ -31,7 +31,7 @@ void main() async {
             children: [
               child!,
               const DropdownAlert(
-                position: AlertPosition.TOP,
+                position: AlertPosition.TOP,duration: 6,
               )
             ],
           ),
