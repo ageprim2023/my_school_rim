@@ -1,20 +1,22 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_dropdown_alert/alert_controller.dart';
+import 'package:flutter_dropdown_alert/model/data_alert.dart';
+
 import '../fonctions/fonctions.dart';
 import '../tools/styles.dart';
 import '../widgets/buttons.dart';
 import '../widgets/container_indicator.dart';
+import '../widgets/icons.dart';
 import '../widgets/pin_put.dart';
 import '../widgets/text_field.dart';
-import 'package:flutter_dropdown_alert/alert_controller.dart';
-import 'package:flutter_dropdown_alert/model/data_alert.dart';
-
 import '../widgets/whats_operator.dart';
 import 'login.dart';
 
 class Registration extends StatefulWidget {
-  static const String root = 'Registration';
+  static const root = 'Registration';
   const Registration({super.key});
 
   @override
@@ -26,46 +28,10 @@ class _RegistrationState extends State<Registration> {
   final nomController = TextEditingController();
   final phoneController = TextEditingController();
   final codeController = TextEditingController();
+  final mailController = TextEditingController();
   int numPhone = 0;
   GlobalKey<FormState> formState = GlobalKey<FormState>();
   bool isRegistrationOK = false;
-
-  registration() async {
-    var formData = formState.currentState;
-    if (formData!.validate()) {
-      try {
-        setState(() {
-          isLoading = true;
-        });
-        UserCredential userCredential = await FirebaseAuth.instance
-            .createUserWithEmailAndPassword(
-                email: 'agep${phoneController.text}@gmail.com',
-                password: '@nrptS${codeController.text}');
-        if (userCredential.user != null) {
-          setState(() {
-            isLoading = false;
-            isRegistrationOK = true;
-          });
-        }
-      } on FirebaseAuthException catch (e) {
-        setState(() {
-          isLoading = false;
-        });
-        if (e.code == 'weak-password') {
-          myShowDialog(context, 'حبذا تغيير الرمز السري');
-        } else if (e.code == 'email-already-in-use') {
-          myShowDialog(context, 'الهاتف الشخصي مسجل سلفا');
-        } else {
-          myShowDialog(context, 'حدث خطأ أثناء التسجيل\n ${e.code}');
-        }
-      } catch (r) {
-        setState(() {
-          isLoading = false;
-        });
-        myShowDialog(context, 'حدث خطأ أثناء التسجيل\n $r');
-      }
-    }
-  }
 
   @override
   void initState() {
@@ -146,7 +112,7 @@ class _RegistrationState extends State<Registration> {
                   height: 8,
                 ),
                 MyTextFormField(
-                  prefix: const Icon(Icons.person),
+                  prefix: const MyIcon(icon: Icons.person),
                   labelText: 'الاسم الشخصي',
                   controller: nomController,
                   onChanged: (p0) {},
@@ -171,7 +137,7 @@ class _RegistrationState extends State<Registration> {
                           : null,
                     ),
                     MyTextFormField(
-                      prefix: const Icon(Icons.phone),
+                      prefix: const MyIcon(icon: Icons.phone),
                       labelText: 'الهاتف الشخصي',
                       controller: phoneController,
                       keyboardType: TextInputType.phone,
@@ -201,6 +167,23 @@ class _RegistrationState extends State<Registration> {
                     }
                     if (codeController.text.length < 4) {
                       return 'الرمز الشخصي ينبغي أن يتكون من 4 أرقام على الأقل';
+                    }
+                    return null;
+                  },
+                ),
+                MyTextFormField(
+                  prefix: const MyIcon(
+                    icon: Icons.mail,
+                  ),
+                  labelText: 'البريد الالكتروني',
+                  hintText: 'لاستعادة الرمز الشخصي في حالة نسيانه',
+                  controller: mailController,
+                  keyboardType: TextInputType.emailAddress,
+                  onChanged: (p0) {},
+                  onValidator: (val) {
+                    if (mailController.text.isNotEmpty &&
+                        !isEmail(mailController.text)) {
+                      return 'البريد الالكتروني غير صحيح';
                     }
                     return null;
                   },
@@ -254,5 +237,63 @@ class _RegistrationState extends State<Registration> {
         ),
       ),
     );
+  }
+
+  registration() async {
+    var formData = formState.currentState;
+    if (formData!.validate()) {
+      try {
+        setState(() {
+          isLoading = true;
+        });
+        UserCredential userCredential = await FirebaseAuth.instance
+            .createUserWithEmailAndPassword(
+                email: 'agep${phoneController.text}@gmail.com',
+                password: '@nrptS${codeController.text}');
+        if (userCredential.user != null) {
+          setState(() {
+            isLoading = false;
+            isRegistrationOK = true;
+          });
+          addEmailToEmailsCollection();
+          //mailController.text.isNotEmpty ? registrationToo() : null;
+        }
+      } on FirebaseAuthException catch (e) {
+        setState(() {
+          isLoading = false;
+        });
+        if (e.code == 'weak-password') {
+          myShowDialog(context, 'حبذا تغيير الرمز الشخصي');
+        } else if (e.code == 'email-already-in-use') {
+          myShowDialog(context, 'الهاتف الشخصي المدخل لديه حساب سلفا');
+        } else {
+          myShowDialog(context, 'حدث خطأ أثناء التسجيل\n ${e.code}');
+        }
+      } catch (r) {
+        setState(() {
+          isLoading = false;
+        });
+        myShowDialog(context, 'حدث خطأ أثناء التسجيل\n $r');
+      }
+    }
+  }
+
+  registrationToo() async {
+    try {
+      await FirebaseAuth.instance.createUserWithEmailAndPassword(
+          email: mailController.text, password: '@nrptS${codeController.text}');
+      // ignore: empty_catches
+    } catch (r) {}
+  }
+
+  addEmailToEmailsCollection() async {
+    CollectionReference collRef =
+        FirebaseFirestore.instance.collection("emails");
+    collRef.doc(phoneController.text).set({
+      'phone': phoneController.text,
+      'email': mailController.text.isNotEmpty
+          ? mailController.text
+          : 'ageprim2023@gmail.com',
+    });
   }
 }

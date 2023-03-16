@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_dropdown_alert/alert_controller.dart';
 import 'package:flutter_dropdown_alert/model/data_alert.dart';
 import '../tools/styles.dart';
+import '../widgets/icons.dart';
 
 Future<void> myShowDialog(BuildContext context, String title,
     {String root = ''}) async {
@@ -10,7 +11,7 @@ Future<void> myShowDialog(BuildContext context, String title,
     barrierDismissible: false, // user must tap button!
     builder: (BuildContext context) {
       return AlertDialog(
-        icon: const Icon(Icons.info),
+        icon: const MyIcon(icon: Icons.info),
         content: SingleChildScrollView(
           child: ListBody(
             children: <Widget>[
@@ -100,6 +101,15 @@ Future<void> myShowDialogYesNo(
       );
     },
   );
+}
+
+bool isEmail(String email) {
+  String p =
+      r'^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$';
+
+  RegExp regExp = RegExp(p);
+
+  return regExp.hasMatch(email);
 }
 
 bool phoneNumberValidator(String value) {

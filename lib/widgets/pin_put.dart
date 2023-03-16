@@ -6,23 +6,25 @@ import '../tools/styles.dart';
 class MyPinPut extends StatelessWidget {
   final TextEditingController? pinController;
   final bool obscureText;
+  final int length;
   final String? Function(String?)? onValidator;
   const MyPinPut(
       {super.key,
       required this.pinController,
       this.obscureText = true,
-      required this.onValidator});
+      required this.onValidator,
+      this.length = 4});
 
   @override
   Widget build(BuildContext context) {
     //final focusNode = FocusNode();
 
     final defaultPinTheme = PinTheme(
-      width: 45,
-      height: 45,
+      width: 35,
+      height: 35,
       textStyle: TextStyle(
-        fontSize: 18,
-        color: colorPrimary,
+        fontSize: 14,
+        color: colorGreen,
       ),
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(19),
@@ -31,6 +33,7 @@ class MyPinPut extends StatelessWidget {
     );
 
     return Pinput(
+      length: length,
       obscureText: obscureText,
       controller: pinController,
       defaultPinTheme: defaultPinTheme,

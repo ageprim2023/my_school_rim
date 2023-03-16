@@ -59,6 +59,7 @@ class MyTextFormField extends StatelessWidget {
   final bool readOnly;
   final Function(String) onChanged;
   final String? Function(String?) onValidator;
+  final String? hintText;
   const MyTextFormField({
     super.key,
     required this.labelText,
@@ -71,18 +72,20 @@ class MyTextFormField extends StatelessWidget {
     this.readOnly = false,
     required this.onChanged,
     required this.onValidator,
+    this.hintText,
   });
 
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.only(top: 6,bottom: 2),
+      padding: const EdgeInsets.only(top: 6, bottom: 2),
       child: TextFormField(
         decoration: InputDecoration(
           contentPadding: const EdgeInsets.only(left: 6),
           prefix: prefix,
           label: Text(labelText),
           suffix: suffix,
+          hintText: hintText,
         ),
         controller: controller,
         enabled: enabled,
