@@ -1,6 +1,9 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_dropdown_alert/alert_controller.dart';
+import 'package:flutter_dropdown_alert/model/data_alert.dart';
+import 'package:my_school_rim/widgets/text_field.dart';
 
 import '../fonctions/fonctions.dart';
 import '../tools/styles.dart';
@@ -8,7 +11,6 @@ import '../widgets/buttons.dart';
 import '../widgets/container_indicator.dart';
 import '../widgets/icons.dart';
 import '../widgets/pin_put.dart';
-import '../widgets/text_field.dart';
 import '../widgets/whats_operator.dart';
 import 'home.dart';
 import 'registration.dart';
@@ -25,10 +27,11 @@ class _LoginState extends State<Login> {
   bool isLoading = false;
   final phoneController = TextEditingController();
   final codeController = TextEditingController();
+  final answerController = TextEditingController();
   int numPhone = 0;
-  GlobalKey<FormState> formState = GlobalKey<FormState>();
   bool isForget = false;
   final auth = FirebaseAuth.instance;
+  bool isShowPassword = false;
 
   @override
   Widget build(BuildContext context) {
@@ -38,23 +41,22 @@ class _LoginState extends State<Login> {
         title: const Text('صفحة الولوج'),
         centerTitle: true,
       ),
-      body: isLoading
-          ? const ContainerIndicator()
-          : ContainerNoIndicator(
-              child: Column(
-                children: [
-                  Image.asset(
-                    'assets/images/appstore.png',
-                    height: 170,
+      body: Stack(children: <Widget>[
+        ContainerNormal(
+          child: Column(
+            children: [
+              cardAccess(),
+              const SizedBox(
+                height: 20,
+              ),
+              Padding(
+                padding: const EdgeInsets.only(left: 16, right: 16),
+                child: Container(
+                  decoration: BoxDecoration(
+                    color: colorForth,
+                    borderRadius: BorderRadius.circular(20),
                   ),
-                  Padding(
-                    padding: const EdgeInsets.only(left: 5, right: 5),
-                    child: cardAccess(),
-                  ),
-                  const SizedBox(
-                    height: 20,
-                  ),
-                  Row(
+                  child: Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
                       const Text('ليس لديك حساب؟'),
@@ -69,22 +71,32 @@ class _LoginState extends State<Login> {
                         child: const Text('قم بفتح حساب من هنا'),
                       )
                     ],
-                  )
-                ],
-              ),
-            ),
+                  ),
+                ),
+              )
+            ],
+          ),
+        ),
+        Container(
+          child: isLoading ? const ContainerIndicator() : null,
+        )
+      ]),
     );
   }
 
-  Card cardAccess() {
-    return Card(
-      elevation: 6,
-      child: Padding(
-        padding: const EdgeInsets.only(left: 5, right: 5),
-        child: Form(
-          key: formState,
+  Widget cardAccess() {
+    return Padding(
+      padding: const EdgeInsets.only(left: 7, right: 7),
+      child: Card(
+        elevation: 6,
+        child: Padding(
+          padding: const EdgeInsets.only(left: 10, right: 10),
           child: Column(
             children: [
+              Image.asset(
+                'assets/images/appstore.png',
+                height: 170,
+              ),
               const SizedBox(
                 height: 8,
               ),
@@ -107,43 +119,76 @@ class _LoginState extends State<Login> {
                           )
                         : null,
                   ),
-                  MyTextFormField(
+                  MyTextField(
                     prefix: const MyIcon(icon: Icons.phone),
-                    labelText: 'الهاتف الشخصي',
-                    controller: phoneController,
                     keyboardType: TextInputType.phone,
-                    onChanged: (p0) {
+                    textController: phoneController,
+                    myTitle: 'الهاتف الشخصي',
+                    onChange: (val) {
                       setState(() {
                         numPhone = phoneController.text.length;
                       });
                     },
-                    onValidator: (val) {
-                      if (val!.isEmpty) {
-                        return 'الهاتف الشخصي مطلوب';
-                      }
-                      if (!phoneNumberValidator(phoneController.text)) {
-                        return 'رقم الهاتف غير صحيح';
-                      }
-                      return null;
-                    },
                   ),
                 ],
               ),
-              const Text('الرمز الشخصي'),
-              MyPinPut(
-                pinController: codeController,
-                onValidator: (val) {
-                  if (val!.isEmpty) {
-                    return 'الرمز الشخصي مطلوب';
-                  }
-                  if (codeController.text.length < 4) {
-                    return 'الرمز الشخصي ينبغي أن يتكون من 4 أرقام على الأقل';
-                  }
-                  return null;
-                },
-              ),
               const SizedBox(
                 height: 10,
+              ),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  IconButton(
+                    onPressed: () {
+                      if (codeController.text.isNotEmpty) {
+                        setState(() {
+                          isShowPassword
+                              ? isShowPassword = false
+                              : isShowPassword = true;
+                        });
+                      }
+                    },
+                    icon: MyIcon(
+                      icon: Icons.remove_red_eye,
+                      color: isShowPassword ? colorGreen : colorRed,
+                    ),
+                  ),
+                  const Text('الرمز الشخصي'),
+                ],
+              ),
+              isShowPassword
+                  ? Container(
+                      padding: const EdgeInsets.only(left: 12, right: 12),
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(18),
+                        color: colorGreen,
+                      ),
+                      child: Text(
+                        codeController.text,
+                        style: const TextStyle(color: colorWhite),
+                      ))
+                  : MyPinPut(
+                      pinController: codeController,
+                    ),
+              const SizedBox(
+                height: 40,
+              ),
+              MyButton(
+                  color: colorGreen!,
+                  title: 'ولوج',
+                  onPressed: () {
+                    if (!phoneNumberValidator(phoneController.text)) {
+                      dropdownAlert('الهاتف الشخصي إلزامي', TypeAlert.error);
+                      return;
+                    }
+                    if (codeController.text.length < 4) {
+                      dropdownAlert('الرمز الشخصي إلزامي', TypeAlert.error);
+                      return;
+                    }
+                    access();
+                  }),
+              const SizedBox(
+                height: 30,
               ),
               Row(
                 mainAxisAlignment: MainAxisAlignment.end,
@@ -152,19 +197,12 @@ class _LoginState extends State<Login> {
                     padding: const EdgeInsets.only(left: 8.0),
                     child: TextButton(
                       onPressed: () {
-                        if (phoneController.text.isEmpty) {
-                          myShowDialog(context, 'ادخل رقم الهاتف أولا');
-                          return;
-                        }
                         if (!phoneNumberValidator(phoneController.text)) {
-                          myShowDialog(context, 'رقم الهاتف غير صحيح');
+                          dropdownAlert(
+                              'الهاتف الشخصي إلزامي', TypeAlert.error);
                           return;
                         }
-                        myShowDialogYesNo(
-                            context, 'هل حقا نسيتم الرقم الشخصي خاصتكم؟', () {
-                          Navigator.pop(context);
-                          forgetCode();
-                        });
+                        forgetCode();
                       },
                       child: Text(
                         'هل نسيت الرمز الشخصي؟',
@@ -178,15 +216,6 @@ class _LoginState extends State<Login> {
                 ],
               ),
               const SizedBox(
-                height: 90,
-              ),
-              MyButton(
-                  color: colorGreen!,
-                  title: 'ولوج',
-                  onPressed: () {
-                    access();
-                  }),
-              const SizedBox(
                 height: 30,
               ),
             ],
@@ -197,40 +226,40 @@ class _LoginState extends State<Login> {
   }
 
   access() async {
-    var formData = formState.currentState;
-    if (formData!.validate()) {
-      try {
-        setState(() {
-          isLoading = true;
-        });
-        UserCredential userCredential = await FirebaseAuth.instance
-            .signInWithEmailAndPassword(
-                email: 'agep${phoneController.text}@gmail.com',
-                password: '@nrptS${codeController.text}');
-        if (userCredential.user != null) {
-          setState(() {
-            isLoading = false;
-          });
-          // ignore: use_build_context_synchronously
-          Navigator.pushReplacementNamed(context, Home.root);
-        }
-      } on FirebaseAuthException catch (e) {
-        setState(() {
-          isLoading = false;
-        });
-        if (e.code == 'user-not-found') {
-          myShowDialog(context, 'رقم الهاتف الشخصي الذي أدخلتم غير مسجل');
-        } else if (e.code == 'wrong-password') {
-          myShowDialog(context, 'الرمز السري الذي أدخلتم غير صحيح');
-        } else {
-          myShowDialog(context, 'حدث خطأ أثناء محاولة الولوج\n ${e.code}');
-        }
-      } catch (r) {
-        setState(() {
-          isLoading = false;
-        });
-        myShowDialog(context, 'حدث خطأ أثناء محاولة الولوج\n $r');
+    try {
+      setState(() {
+        isLoading = true;
+      });
+      UserCredential userCredential = await FirebaseAuth.instance
+          .signInWithEmailAndPassword(
+              email: 'agep${phoneController.text}@gmail.com',
+              password: '@nrptS${codeController.text}');
+      if (userCredential.user != null) {
+        dropdownAlert('تم الولوج بنجاح', TypeAlert.success);
+        // ignore: use_build_context_synchronously
+        Navigator.pushReplacementNamed(context, Home.root,
+            arguments: phoneController.text);
       }
+    } on FirebaseAuthException catch (e) {
+      setState(() {
+        isLoading = false;
+      });
+      if (e.code == 'user-not-found') {
+        dropdownAlert(
+            'رقم الهاتف الشخصي الذي أدخلتم غير مسجل', TypeAlert.error);
+      } else if (e.code == 'wrong-password') {
+        dropdownAlert('الرمز السري الذي أدخلتم غير صحيح', TypeAlert.error);
+      } else if (e.code == 'network-request-failed') {
+        dropdownAlert('توجد مشكلة في الانترنت لديكم', TypeAlert.error);
+      } else {
+        dropdownAlert(
+            'حدث خطأ أثناء محاولة الولوج\n ${e.code}', TypeAlert.error);
+      }
+    } catch (r) {
+      setState(() {
+        isLoading = false;
+      });
+      dropdownAlert('حدث خطأ أثناء محاولة الولوج\n $r', TypeAlert.error);
     }
   }
 
@@ -243,42 +272,124 @@ class _LoginState extends State<Login> {
           email: 'agep${phoneController.text}@gmail.com',
           password: '@nrptSagep3344');
     } on FirebaseAuthException catch (e) {
-      setState(() {
-        isLoading = false;
-      });
       if (e.code == 'user-not-found') {
-        myShowDialog(context, 'رقم الهاتف الشخصي الذي أدخلتم غير مسجل');
+        setState(() {
+          isLoading = false;
+        });
+        dropdownAlert(
+            'رقم الهاتف الشخصي الذي أدخلتم غير مسجل', TypeAlert.error);
       } else if (e.code == 'wrong-password') {
         /////
-        resetPassword();
+        getCode();
         /////
       } else {
-        myShowDialog(context, 'حدث خطأ أثناء محاولة الولوج\n ${e.code}');
+        setState(() {
+          isLoading = false;
+        });
+        dropdownAlert(
+            'حدث خطأ أثناء محاولة الولوج\n ${e.code}', TypeAlert.error);
       }
     } catch (r) {
       setState(() {
         isLoading = false;
       });
-      myShowDialog(context, 'حدث خطأ أثناء محاولة الولوج\n $r');
+      dropdownAlert('حدث خطأ أثناء محاولة الولوج\n $r', TypeAlert.error);
     }
   }
 
-  Future resetPassword() async {
-    String email = '';
+  Future getCode() async {
     DocumentReference doc = FirebaseFirestore.instance
         .collection("emails")
         .doc(phoneController.text);
     await doc.get().then((value) async {
+      setState(() {
+        isLoading = false;
+      });
       if (value.exists) {
-        email = value['email'];
-        await auth.sendPasswordResetEmail(email: email).then((value) {
-          print("send ***********************************");
-        }).catchError((e) {
-          print("$e ***********************************");
+        if (value['ask'] == '') {
+          dropdownAlert(
+              'لم تقوموا بإضافة وسيلة لاستعادة الرمز الشخصي، لذا يرجى التواصل مع المبرمج',
+              TypeAlert.error);
+          return;
+        }
+        myShowDialogWithField(context, 'سؤالكم كان:', value['ask'], () {
+          Navigator.pop(context);
+          if (answerController.text == value['answer']) {
+            dropdownAlert(
+                'صح،\n رمزكم الشخصي هو ${value['code']}', TypeAlert.success);
+          } else {
+            dropdownAlert('خطأ، يرجى إعادة المحاولة', TypeAlert.error);
+          }
         });
       } else {
-        myShowDialog(context, 'يرجى التواصل مع المبرمج');
+        dropdownAlert('يرجى التواصل مع المبرمج', TypeAlert.warning);
       }
     });
+  }
+
+  Future<void> myShowDialogWithField(
+    BuildContext context,
+    String title,
+    String quation,
+    VoidCallBack onPressed,
+  ) async {
+    return showDialog<void>(
+      context: context,
+      barrierDismissible: false, // user must tap button!
+      builder: (BuildContext context) {
+        return AlertDialog(
+          icon: const Icon(Icons.info),
+          content: SingleChildScrollView(
+            child: ListBody(
+              children: <Widget>[
+                Text(
+                  title,
+                  style: TextStyle(
+                    color: colorPrimary,
+                  ),
+                ),
+                Text(
+                  quation,
+                  style: TextStyle(
+                    color: colorThird,
+                  ),
+                ),
+                MyTextFormField(
+                    labelText: 'فما هو الجواب؟',
+                    controller: answerController,
+                    onChanged: (val) {},
+                    onValidator: (val) {}),
+              ],
+            ),
+          ),
+          actions: <Widget>[
+            TextButton(
+              onPressed: onPressed,
+              child: Text(
+                'تأكيد',
+                style: TextStyle(
+                  //fontFamily: 'Amiri',
+                  color: colorGreen,
+                  fontSize: 20,
+                ),
+              ),
+            ),
+            TextButton(
+              child: Text(
+                'إلغاء',
+                style: TextStyle(
+                  //fontFamily: 'Amiri',
+                  color: colorRed,
+                  fontSize: 20,
+                ),
+              ),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            ),
+          ],
+        );
+      },
+    );
   }
 }

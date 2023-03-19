@@ -2,6 +2,8 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_dropdown_alert/dropdown_alert.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
+import 'package:my_school_rim/models/utilisateurs.dart';
+import 'screens/data.dart';
 import 'screens/home.dart';
 import 'screens/login.dart';
 import 'screens/registration.dart';
@@ -41,5 +43,6 @@ void main() async {
         Login.root: (context) => const Login(),
         Registration.root: (context) => const Registration(),
         Home.root: (context) => const Home(),
+        Data.root :(context) =>   Data(utilisateur: Utilisateur('', '', '', '', ''),),
       }));
 }

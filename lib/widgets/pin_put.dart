@@ -7,12 +7,12 @@ class MyPinPut extends StatelessWidget {
   final TextEditingController? pinController;
   final bool obscureText;
   final int length;
-  final String? Function(String?)? onValidator;
+  //final String? Function(String?)? onValidator;
   const MyPinPut(
       {super.key,
       required this.pinController,
       this.obscureText = true,
-      required this.onValidator,
+      //required this.onValidator,
       this.length = 4});
 
   @override
@@ -27,7 +27,7 @@ class MyPinPut extends StatelessWidget {
         color: colorGreen,
       ),
       decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(19),
+        borderRadius: BorderRadius.circular(10),
         border: Border.all(color: colorPrimary!),
       ),
     );
@@ -37,7 +37,7 @@ class MyPinPut extends StatelessWidget {
       obscureText: obscureText,
       controller: pinController,
       defaultPinTheme: defaultPinTheme,
-      validator: onValidator,
+      //validator: onValidator,
       //focusNode: focusNode,
       // androidSmsAutofillMethod: AndroidSmsAutofillMethod.smsUserConsentApi,
       // listenForMultipleSmsOnAndroid: true,

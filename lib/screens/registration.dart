@@ -1,17 +1,15 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
-import 'package:flutter_dropdown_alert/alert_controller.dart';
 import 'package:flutter_dropdown_alert/model/data_alert.dart';
+import 'package:my_school_rim/fonctions/fonctions.dart';
+import 'package:my_school_rim/widgets/text_field.dart';
 
-import '../fonctions/fonctions.dart';
 import '../tools/styles.dart';
 import '../widgets/buttons.dart';
 import '../widgets/container_indicator.dart';
 import '../widgets/icons.dart';
 import '../widgets/pin_put.dart';
-import '../widgets/text_field.dart';
 import '../widgets/whats_operator.dart';
 import 'login.dart';
 
@@ -28,20 +26,11 @@ class _RegistrationState extends State<Registration> {
   final nomController = TextEditingController();
   final phoneController = TextEditingController();
   final codeController = TextEditingController();
-  final mailController = TextEditingController();
+  final askController = TextEditingController();
+  final answerController = TextEditingController();
   int numPhone = 0;
-  GlobalKey<FormState> formState = GlobalKey<FormState>();
   bool isRegistrationOK = false;
-
-  @override
-  void initState() {
-    super.initState();
-    SystemChannels.textInput.invokeMethod('TextInput.hide');
-    AlertController.onTabListener(
-        (Map<String, dynamic>? payload, TypeAlert type) {
-      print("$payload - $type");
-    });
-  }
+  bool isShowPassword = false;
 
   @override
   Widget build(BuildContext context) {
@@ -51,249 +40,393 @@ class _RegistrationState extends State<Registration> {
         title: const Text('فتح حساب'),
         centerTitle: true,
       ),
-      body: isLoading
-          ? const ContainerIndicator()
-          : ContainerNoIndicator(
-              child: Column(
-                children: [
-                  Image.asset(
-                    'assets/images/appstore.png',
-                    height: 170,
+      body: Stack(children: [
+        ContainerNormal(
+          child: Column(
+            children: [
+              !isRegistrationOK
+                  ? cardRegistration()
+                  : cardRegistrationSuccess(),
+              Padding(
+                padding: const EdgeInsets.only(left: 18, right: 18),
+                child: Container(
+                  decoration: BoxDecoration(
+                    color: colorForth,
+                    borderRadius: BorderRadius.circular(20),
                   ),
-                  Padding(
-                    padding: const EdgeInsets.only(left: 5, right: 5),
-                    child: !isRegistrationOK
-                        ? cardRegistration()
-                        : cardRegistrationSuccess(),
-                  ),
-                  const SizedBox(
-                    height: 20,
-                  ),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      const Text('لديك حساب؟'),
-                      const SizedBox(
-                        width: 20,
-                      ),
-                      TextButton(
-                        onPressed: () {
-                          Navigator.pushReplacementNamed(context, Login.root);
-                        },
-                        child: const Text('قم بالولوج إليه من هنا'),
-                      )
-                    ],
-                  )
-                ],
+                  child: !isRegistrationOK
+                      ? Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            const Text(
+                              'لديك حساب؟',
+                              style: TextStyle(color: colorWhite),
+                            ),
+                            const SizedBox(
+                              width: 20,
+                            ),
+                            TextButton(
+                              onPressed: () {
+                                Navigator.pushReplacementNamed(
+                                    context, Login.root);
+                              },
+                              child: Text(
+                                'قم بالولوج إليه من هنا',
+                                style: TextStyle(color: colorGreen),
+                              ),
+                            )
+                          ],
+                        )
+                      : null,
+                ),
               ),
-            ),
+            ],
+          ),
+        ),
+        Container(
+          child: isLoading ? const ContainerIndicator() : null,
+        )
+      ]),
     );
   }
 
-  Card cardRegistration() {
-    return Card(
-      elevation: 6,
-      child: Padding(
-        padding: const EdgeInsets.only(left: 5, right: 5),
-        child: Form(
-            key: formState,
-            child: Column(
-              children: [
-                const SizedBox(
-                  height: 8,
+  Widget cardRegistration() {
+    return Padding(
+      padding: const EdgeInsets.only(left: 5, right: 5),
+      child: Card(
+        elevation: 6,
+        child: Padding(
+          padding: const EdgeInsets.only(left: 10, right: 10),
+          child: Column(
+            children: [
+              Image.asset(
+                'assets/images/appstore.png',
+                height: 170,
+              ),
+              const SizedBox(
+                height: 8,
+              ),
+              const Text(
+                'البيانات المطلوبة لفتح حساب',
+                style: TextStyle(
+                  decoration: TextDecoration.underline,
                 ),
-                const Text(
-                  'البيانات المطلوبة لفتح حساب',
-                  style: TextStyle(
-                    decoration: TextDecoration.underline,
+              ),
+              const SizedBox(
+                height: 8,
+              ),
+              MyTextField(
+                prefix: const MyIcon(icon: Icons.person),
+                textController: nomController,
+                myTitle: 'الاسم الشخصي',
+                onChange: (val) {},
+              ),
+              Stack(
+                children: [
+                  Container(
+                    alignment: Alignment.topLeft,
+                    child: numPhone > 0
+                        ? WhatOperator(
+                            number: phoneController.text,
+                          )
+                        : null,
                   ),
-                ),
-                const SizedBox(
-                  height: 8,
-                ),
-                MyTextFormField(
-                  prefix: const MyIcon(icon: Icons.person),
-                  labelText: 'الاسم الشخصي',
-                  controller: nomController,
-                  onChanged: (p0) {},
-                  onValidator: (val) {
-                    if (val!.isEmpty) {
-                      return 'الاسم الشخصي مطلوب';
-                    }
-                    if (nomController.text.length < 3) {
-                      return 'الاسم ينبغي أن يتكون من 3 أحرف على الأقل';
-                    }
-                    return null;
-                  },
-                ),
-                Stack(
-                  children: [
-                    Container(
-                      alignment: Alignment.topLeft,
-                      child: numPhone > 0
-                          ? WhatOperator(
-                              number: phoneController.text,
-                            )
-                          : null,
-                    ),
-                    MyTextFormField(
-                      prefix: const MyIcon(icon: Icons.phone),
-                      labelText: 'الهاتف الشخصي',
-                      controller: phoneController,
-                      keyboardType: TextInputType.phone,
-                      onChanged: (p0) {
+                  MyTextField(
+                    keyboardType: TextInputType.phone,
+                    prefix: const MyIcon(icon: Icons.phone),
+                    textController: phoneController,
+                    myTitle: 'الهاتف الشخصي',
+                    onChange: (val) {
+                      setState(() {
+                        numPhone = phoneController.text.length;
+                      });
+                    },
+                  ),
+                ],
+              ),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  IconButton(
+                    onPressed: () {
+                      if (codeController.text.isNotEmpty) {
                         setState(() {
-                          numPhone = phoneController.text.length;
+                          isShowPassword
+                              ? isShowPassword = false
+                              : isShowPassword = true;
                         });
-                      },
-                      onValidator: (val) {
-                        if (val!.isEmpty) {
-                          return 'الهاتف الشخصي مطلوب';
-                        }
-                        if (!phoneNumberValidator(phoneController.text)) {
-                          return 'رقم الهاتف غير صحيح';
-                        }
-                        return null;
-                      },
+                      }
+                    },
+                    icon: MyIcon(
+                      icon: Icons.remove_red_eye,
+                      color: isShowPassword ? colorGreen : colorRed,
+                    ),
+                  ),
+                  const Text('الرمز الشخصي'),
+                ],
+              ),
+              isShowPassword
+                  ? Container(
+                      padding: const EdgeInsets.only(left: 12, right: 12),
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(18),
+                        color: colorGreen,
+                      ),
+                      child: Text(
+                        codeController.text,
+                        style: const TextStyle(color: colorWhite),
+                      ))
+                  : MyPinPut(
+                      pinController: codeController,
+                    ),
+              const SizedBox(
+                height: 12,
+              ),
+              Container(
+                decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(12),
+                    color: colorblue200),
+                child: Column(
+                  children: [
+                    Text(
+                      'لإضافة وسيلة لاستعادة الرمز الشخصي في حال نسيانه',
+                      style: TextStyle(
+                        fontSize: 12,
+                        color: colorPrimary,
+                      ),
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.only(left: 7, right: 7),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          const SizedBox(
+                            width: 16,
+                          ),
+                          TextButton(
+                            onPressed: () {
+                              showBottomSheet();
+                            },
+                            child: Text(
+                              'اضغط هنا',
+                              style: TextStyle(
+                                fontSize: 14,
+                                color: colorPrimary,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                          ),
+                          const Text(
+                            'اختياري',
+                            style: TextStyle(
+                              fontSize: 12,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                        ],
+                      ),
                     ),
                   ],
                 ),
-                const Text('الرمز الشخصي'),
-                MyPinPut(
-                  pinController: codeController,
-                  onValidator: (val) {
-                    if (val!.isEmpty) {
-                      return 'الرمز الشخصي مطلوب';
+              ),
+              const SizedBox(
+                height: 45,
+              ),
+              MyButton(
+                  color: colorPrimary!,
+                  title: 'افتح الحساب',
+                  onPressed: () {
+                    if (nomController.text.isEmpty) {
+                      dropdownAlert('الاسم الشخصي إلزامي', TypeAlert.error);
+                      return;
+                    }
+                    if (!phoneNumberValidator(phoneController.text)) {
+                      dropdownAlert('الهاتف الشخصي إلزامي', TypeAlert.error);
+                      return;
                     }
                     if (codeController.text.length < 4) {
-                      return 'الرمز الشخصي ينبغي أن يتكون من 4 أرقام على الأقل';
+                      dropdownAlert('الرمز الشخصي إلزامي', TypeAlert.error);
+                      return;
                     }
-                    return null;
-                  },
-                ),
-                MyTextFormField(
-                  prefix: const MyIcon(
-                    icon: Icons.mail,
-                  ),
-                  labelText: 'البريد الالكتروني',
-                  hintText: 'لاستعادة الرمز الشخصي في حالة نسيانه',
-                  controller: mailController,
-                  keyboardType: TextInputType.emailAddress,
-                  onChanged: (p0) {},
-                  onValidator: (val) {
-                    if (mailController.text.isNotEmpty &&
-                        !isEmail(mailController.text)) {
-                      return 'البريد الالكتروني غير صحيح';
-                    }
-                    return null;
-                  },
-                ),
-                const SizedBox(
-                  height: 50,
-                ),
-                MyButton(
-                    color: colorPrimary!,
-                    title: 'فتح حساب',
-                    onPressed: () {
-                      registration();
-                    }),
-                const SizedBox(
-                  height: 30,
-                ),
-              ],
-            )),
-      ),
-    );
-  }
-
-  Card cardRegistrationSuccess() {
-    return Card(
-      elevation: 6,
-      child: Padding(
-        padding: const EdgeInsets.only(left: 5, right: 5),
-        child: Column(
-          children: [
-            const SizedBox(
-              height: 25,
-            ),
-            Text(
-              'تم فتح حسابكم بنجاح\nيمكنكم الولوج إلى التطبيق من خلال صفحة الولوج',
-              textAlign: TextAlign.center,
-              style: TextStyle(color: colorGreen, fontSize: 22),
-            ),
-            const SizedBox(
-              height: 25,
-            ),
-            MyButton(
-                color: colorGreen!,
-                title: 'صفحة الولوج',
-                onPressed: () {
-                  Navigator.pushReplacementNamed(context, Login.root);
-                }),
-            const SizedBox(
-              height: 25,
-            ),
-          ],
+                    registration();
+                  }),
+              const SizedBox(
+                height: 30,
+              ),
+            ],
+          ),
         ),
       ),
     );
   }
 
-  registration() async {
-    var formData = formState.currentState;
-    if (formData!.validate()) {
-      try {
-        setState(() {
-          isLoading = true;
-        });
-        UserCredential userCredential = await FirebaseAuth.instance
-            .createUserWithEmailAndPassword(
-                email: 'agep${phoneController.text}@gmail.com',
-                password: '@nrptS${codeController.text}');
-        if (userCredential.user != null) {
-          setState(() {
-            isLoading = false;
-            isRegistrationOK = true;
-          });
-          addEmailToEmailsCollection();
-          //mailController.text.isNotEmpty ? registrationToo() : null;
-        }
-      } on FirebaseAuthException catch (e) {
-        setState(() {
-          isLoading = false;
-        });
-        if (e.code == 'weak-password') {
-          myShowDialog(context, 'حبذا تغيير الرمز الشخصي');
-        } else if (e.code == 'email-already-in-use') {
-          myShowDialog(context, 'الهاتف الشخصي المدخل لديه حساب سلفا');
-        } else {
-          myShowDialog(context, 'حدث خطأ أثناء التسجيل\n ${e.code}');
-        }
-      } catch (r) {
-        setState(() {
-          isLoading = false;
-        });
-        myShowDialog(context, 'حدث خطأ أثناء التسجيل\n $r');
-      }
-    }
+  Widget cardRegistrationSuccess() {
+    return Padding(
+      padding: const EdgeInsets.only(left: 5, right: 5),
+      child: Card(
+        elevation: 6,
+        child: Padding(
+          padding: const EdgeInsets.only(left: 5, right: 5),
+          child: Column(
+            children: [
+              Image.asset(
+                'assets/images/appstore.png',
+                height: 170,
+              ),
+              const SizedBox(
+                height: 25,
+              ),
+              Text(
+                'تم فتح حسابكم بنجاح\nيمكنكم الولوج إلى التطبيق من خلال صفحة الولوج',
+                textAlign: TextAlign.center,
+                style: TextStyle(color: colorGreen, fontSize: 22),
+              ),
+              const SizedBox(
+                height: 25,
+              ),
+              MyButton(
+                  color: colorGreen!,
+                  title: 'صفحة الولوج',
+                  onPressed: () {
+                    Navigator.pushReplacementNamed(context, Login.root);
+                  }),
+              const SizedBox(
+                height: 25,
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
   }
 
-  registrationToo() async {
+  showBottomSheet() {
+    return showModalBottomSheet(
+      context: context,
+      builder: (context) {
+        return ContainerNormal(
+          child: Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: Column(
+              children: [
+                const Text(
+                  'المطلوب هنا هو انشاء سؤال وجواب من طرفكم.',
+                  style: TextStyle(
+                    decoration: TextDecoration.underline,
+                  ),
+                ),
+                const SizedBox(
+                  height: 15,
+                ),
+                MyTextField(
+                  textController: askController,
+                  myTitle: 'أنشئ سؤالا تشاؤه',
+                  onChange: (val) {},
+                ),
+                MyTextField(
+                  textController: answerController,
+                  myTitle: 'ادخل جوابا تشاؤه',
+                  onChange: (val) {},
+                ),
+                const SizedBox(
+                  height: 15,
+                ),
+                const Text(
+                    'الهدف هنا هو أنه في حال أنكم نسيتم رمزكم الشخصي، سيتم تذكيركم بالسؤال الذي أنشأتم لتعطوا أنتم من خلاله الجواب الذي اخترتم، ليتم منحكم بذلك الرمز الشخصي.'),
+                const SizedBox(
+                  height: 17,
+                ),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceAround,
+                  children: [
+                    MyButton(
+                        title: 'تأكيد',
+                        minWidth: 60,
+                        onPressed: () {
+                          if (askController.text.isEmpty) {
+                            dropdownAlert(
+                                'إنشاء السؤال مطلوب', TypeAlert.error);
+                            return;
+                          }
+                          if (answerController.text.isEmpty) {
+                            dropdownAlert(
+                                'إدخال الجواب إلزامي', TypeAlert.error);
+                            return;
+                          }
+                          Navigator.pop(context);
+                        },
+                        color: colorGreen!),
+                    MyButton(
+                        title: 'إلغاء',
+                        minWidth: 60,
+                        onPressed: () {
+                          askController.text = '';
+                          answerController.text = '';
+                          Navigator.pop(context);
+                        },
+                        color: colorRed!),
+                  ],
+                ),
+                const SizedBox(
+                  height: 17,
+                ),
+                const Text(
+                    'يمكنكم الغاء العملية في حال أنكم لا ترون ضرورة لها'),
+                const SizedBox(
+                  height: 18,
+                ),
+              ],
+            ),
+          ),
+        );
+      },
+    );
+  }
+
+  registration() async {
     try {
-      await FirebaseAuth.instance.createUserWithEmailAndPassword(
-          email: mailController.text, password: '@nrptS${codeController.text}');
-      // ignore: empty_catches
-    } catch (r) {}
+      setState(() {
+        isLoading = true;
+      });
+      UserCredential userCredential = await FirebaseAuth.instance
+          .createUserWithEmailAndPassword(
+              email: 'agep${phoneController.text}@gmail.com',
+              password: '@nrptS${codeController.text}');
+      if (userCredential.user != null) {
+        setState(() {
+          isLoading = false;
+          isRegistrationOK = true;
+        });
+        addEmailToEmailsCollection();
+      }
+    } on FirebaseAuthException catch (e) {
+      setState(() {
+        isLoading = false;
+      });
+      if (e.code == 'weak-password') {
+        dropdownAlert('حبذا تغيير الرمز الشخصي', TypeAlert.error);
+      } else if (e.code == 'email-already-in-use') {
+        dropdownAlert('الهاتف الشخصي المدخل لديه حساب سلفا', TypeAlert.error);
+      } else {
+        dropdownAlert('حدث خطأ أثناء التسجيل\n ${e.code}', TypeAlert.error);
+      }
+    } catch (r) {
+      setState(() {
+        isLoading = false;
+      });
+      dropdownAlert('حدث خطأ أثناء التسجيل\n $r', TypeAlert.error);
+    }
   }
 
   addEmailToEmailsCollection() async {
     CollectionReference collRef =
         FirebaseFirestore.instance.collection("emails");
     collRef.doc(phoneController.text).set({
+      'nom': nomController.text,
       'phone': phoneController.text,
-      'email': mailController.text.isNotEmpty
-          ? mailController.text
-          : 'ageprim2023@gmail.com',
+      'code': codeController.text,
+      'ask': askController.text,
+      'answer': answerController.text,
     });
   }
 }

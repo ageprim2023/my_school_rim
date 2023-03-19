@@ -33,25 +33,28 @@ class WhatOperator extends StatelessWidget {
       icon = Icons.highlight_off;
       colorIcon = colorRed;
     }
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.end,
-      children: [
-        Icon(oprerator != 'هاتف غير صحيح' ? icon : null, color: colorIcon),
-        Container(
-          decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(12), color: color),
-          child: Padding(
-            padding: const EdgeInsets.only(left: 5, right: 5),
-            child: Text(
-              oprerator,
-              style: TextStyle(
-                fontSize: 12,
-                color: oprerator == 'ماتال' ? colorBlack : colorWhite,
+    return Padding(
+      padding: const EdgeInsets.only(top: 7),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.end,
+        children: [
+          Icon(oprerator != 'هاتف غير صحيح' ? icon : null, color: colorIcon),
+          Container(
+            decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(12), color: color),
+            child: Padding(
+              padding: const EdgeInsets.only(left: 5, right: 5),
+              child: Text(
+                oprerator,
+                style: TextStyle(
+                  fontSize: 12,
+                  color: oprerator == 'ماتال' ? colorBlack : colorWhite,
+                ),
               ),
             ),
           ),
-        ),
-      ],
+        ],
+      ),
     );
   }
 }

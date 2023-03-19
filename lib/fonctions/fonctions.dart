@@ -6,6 +6,7 @@ import '../widgets/icons.dart';
 
 Future<void> myShowDialog(BuildContext context, String title,
     {String root = ''}) async {
+    
   return showDialog<void>(
     context: context,
     barrierDismissible: false, // user must tap button!
@@ -117,10 +118,10 @@ bool phoneNumberValidator(String value) {
   return regex.hasMatch(value) && value.length == 8;
 }
 
-void dropdownAlert(String message) {
-  Map<String, dynamic> payload = new Map<String, dynamic>();
+void dropdownAlert(String message,TypeAlert typeAlert) {
+  Map<String, dynamic> payload = <String, dynamic>{};
   payload["data"] = "content";
-  AlertController.show("", message, TypeAlert.success, payload);
+  AlertController.show("", message, typeAlert, payload);
 }
 
 String phoneNumberOprerator(String value) {
