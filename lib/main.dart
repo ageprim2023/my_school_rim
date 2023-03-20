@@ -43,6 +43,6 @@ void main() async {
         Login.root: (context) => const Login(),
         Registration.root: (context) => const Registration(),
         Home.root: (context) => const Home(),
-        Data.root :(context) =>   Data(utilisateur: Utilisateur('', '', '', '', ''),),
+        Data.root: (context) => Data(utilisateur: Utilisateur.empty()),
       }));
 }

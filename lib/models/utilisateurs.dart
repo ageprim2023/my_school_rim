@@ -7,5 +7,10 @@ class Utilisateur {
 
   Utilisateur(this.nom, this.phone, this.code, this.ask, this.answer);
 
-  
+  Utilisateur.empty()
+      : nom = '',
+        phone = '',
+        code = '',
+        ask = '',
+        answer = '';
 }
