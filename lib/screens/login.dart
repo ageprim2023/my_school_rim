@@ -6,6 +6,7 @@ import 'package:flutter_dropdown_alert/model/data_alert.dart';
 import 'package:my_school_rim/widgets/text_field.dart';
 
 import '../fonctions/fonctions.dart';
+import '../models/utilisateurs.dart';
 import '../tools/styles.dart';
 import '../widgets/buttons.dart';
 import '../widgets/container_indicator.dart';
@@ -32,6 +33,7 @@ class _LoginState extends State<Login> {
   bool isForget = false;
   final auth = FirebaseAuth.instance;
   bool isShowPassword = false;
+  Utilisateur thisUtilisateur = Utilisateur.empty();
 
   @override
   Widget build(BuildContext context) {
@@ -235,10 +237,9 @@ class _LoginState extends State<Login> {
               email: 'agep${phoneController.text}@gmail.com',
               password: '@nrptS${codeController.text}');
       if (userCredential.user != null) {
-        dropdownAlert('تم الولوج بنجاح', TypeAlert.success);
-        // ignore: use_build_context_synchronously
-        Navigator.pushReplacementNamed(context, Home.root,
-            arguments: phoneController.text);
+        print('ffffffffffffff ${userCredential.user?.getIdToken().toString()}');
+        
+        getData();
       }
     } on FirebaseAuthException catch (e) {
       setState(() {
@@ -391,5 +392,27 @@ class _LoginState extends State<Login> {
         );
       },
     );
+  }
+
+  void getData() async {
+    try {
+      await FirebaseFirestore.instance
+          .collection("emails")
+          .doc(phoneController.text)
+          .get()
+          .then((value) => {
+                thisUtilisateur = Utilisateur(value['nom'], value['phone'],
+                    value['code'], value['ask'], value['answer'])
+              });
+      dropdownAlert('تم الولوج بنجاح', TypeAlert.success);
+      // ignore: use_build_context_synchronously
+      Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(
+            builder: (context) => Home(utilisateur: thisUtilisateur),
+          ));
+    } catch (e) {
+      myShowDialog(context, '$e');
+    }
   }
 }

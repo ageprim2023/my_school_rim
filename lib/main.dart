@@ -42,7 +42,7 @@ void main() async {
       routes: {
         Login.root: (context) => const Login(),
         Registration.root: (context) => const Registration(),
-        Home.root: (context) => const Home(),
+        Home.root: (context) =>  Home(utilisateur: Utilisateur.empty()),
         Data.root: (context) => Data(utilisateur: Utilisateur.empty()),
       }));
 }

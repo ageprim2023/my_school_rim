@@ -6,27 +6,31 @@ import 'package:my_school_rim/widgets/icons.dart';
 import '../fonctions/fonctions.dart';
 import '../models/utilisateurs.dart';
 import '../tools/styles.dart';
-import '../widgets/buttons.dart';
 import 'data.dart';
 import 'login.dart';
 
 class Home extends StatefulWidget {
   static const root = 'Home';
-  const Home({super.key});
+  final Utilisateur utilisateur;
+  const Home({super.key, required this.utilisateur});
 
   @override
-  State<Home> createState() => _HomeState();
+  // ignore: no_logic_in_create_state
+  State<Home> createState() => _HomeState(utilisateur);
 }
 
 class _HomeState extends State<Home> {
-  late Utilisateur utilisateur;
-  late String phoneNumber;
+  final Utilisateur utilisateur;
+  late Utilisateur thisUtilisateur;
+  //late String phoneNumber;
   User? userCurrent = FirebaseAuth.instance.currentUser;
+
+  _HomeState(this.utilisateur);
 
   @override
   Widget build(BuildContext context) {
-    phoneNumber = ModalRoute.of(context)?.settings.arguments as String;
-    getData();
+    //phoneNumber = ModalRoute.of(context)?.settings.arguments as String;
+    //getData();
     return Scaffold(
       appBar: AppBar(actions: [
         IconButton(
@@ -42,41 +46,44 @@ class _HomeState extends State<Home> {
           icon: const Icon(Icons.close),
         )
       ]),
+      body: Text('nom ${utilisateur.nom}'),
       drawer: Drawer(
         child: ListView(
           children: [
-            DrawerHeader(
+            DrawerHeader(padding: const EdgeInsets.only(bottom: 0,top: 6,left: 12,right: 12),
               decoration: BoxDecoration(
                   gradient:
-                      LinearGradient(colors: [colorWhite, colorPrimary!])),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: const [
-                  CircleAvatar(
-                    radius: 40,
-                    backgroundImage: AssetImage('assets/images/appstore.png'),
-                  ),
-                  CircleAvatar(
-                    radius: 80,
-                    backgroundImage: AssetImage('assets/images/1234.png'),
-                  ),
-                ],
-              ),
+                      LinearGradient(colors: [colorSecondary!, colorPrimary!])),
+              child: Stack(children: [
+                Container(
+                  alignment: Alignment.bottomCenter,
+                  child: Text(utilisateur.nom,style: const TextStyle(color: Colors.white),),),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: const [
+                    CircleAvatar(
+                      radius: 40,
+                      backgroundImage: AssetImage('assets/images/appstore.png'),
+                    ),
+                    CircleAvatar(
+                      radius: 60,
+                      backgroundImage: AssetImage('assets/images/1234.png'),
+                    ),
+                  ],
+                ),
+              ]),
             ),
             Padding(
               padding: const EdgeInsets.only(right: 10),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
-                  labelDrawwer('المهام', colorThird!),
                   const SizedBox(
-                    height: 12,
+                    height: 42,
                   ),
-                  listTile(
-                      Icons.manage_accounts, colorThird, 'إدارة مدرسة', () {}),
-                  listTile(Icons.badge, colorThird, 'انتساب لمدرسة', () {}),
+                  listTile(Icons.school, colorThird, 'إدارة مدرسة', () {}),
                   const Divider(),
-                  listTile(Icons.school, colorPrimary, 'مدارسي', () {}),
+                  listTile(Icons.badge, colorPrimary, 'انتساب لمدرسة', () {}),
                   const Divider(),
                   listTile(Icons.account_balance, colorGreen, 'بيانات الحساب',
                       () {
@@ -87,6 +94,7 @@ class _HomeState extends State<Home> {
                           builder: (context) => Data(utilisateur: utilisateur),
                         ));
                   }),
+                  const Divider(),
                   listTile(Icons.exit_to_app, colorRed, 'خروج', () {
                     myShowDialogYesNo(context, 'هل تربد حقا غلق التطبيق؟',
                         () async {
@@ -129,10 +137,10 @@ class _HomeState extends State<Home> {
   void getData() async {
     await FirebaseFirestore.instance
         .collection("emails")
-        .doc(phoneNumber)
+        .doc(thisUtilisateur.phone)
         .get()
         .then((value) => {
-              utilisateur = Utilisateur(value['nom'], value['phone'],
+              thisUtilisateur = Utilisateur(value['nom'], value['phone'],
                   value['code'], value['ask'], value['answer'])
             });
   }
