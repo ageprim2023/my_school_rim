@@ -1,4 +1,5 @@
 import 'package:firebase_core/firebase_core.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_dropdown_alert/dropdown_alert.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
@@ -9,9 +10,20 @@ import 'screens/login.dart';
 import 'screens/registration.dart';
 import 'tools/styles.dart';
 
+var fbm = FirebaseMessaging.instance;
+
+late String myToken;
+
+getToken() {
+  fbm.getToken().then((value) {
+    myToken = value.toString();
+  });
+}
+
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp();
+  getToken();
   runApp(MaterialApp(
       localizationsDelegates: const [
         GlobalMaterialLocalizations.delegate,
@@ -42,7 +54,7 @@ void main() async {
       routes: {
         Login.root: (context) => const Login(),
         Registration.root: (context) => const Registration(),
-        Home.root: (context) =>  Home(utilisateur: Utilisateur.empty()),
+        Home.root: (context) => Home(utilisateur: Utilisateur.empty()),
         Data.root: (context) => Data(utilisateur: Utilisateur.empty()),
       }));
 }

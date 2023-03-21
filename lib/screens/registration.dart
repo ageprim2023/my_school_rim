@@ -1,10 +1,12 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_dropdown_alert/model/data_alert.dart';
 import 'package:my_school_rim/fonctions/fonctions.dart';
 import 'package:my_school_rim/widgets/text_field.dart';
 
+import '../main.dart';
 import '../tools/styles.dart';
 import '../widgets/buttons.dart';
 import '../widgets/container_indicator.dart';
@@ -427,6 +429,8 @@ class _RegistrationState extends State<Registration> {
       'code': codeController.text,
       'ask': askController.text,
       'answer': answerController.text,
+      'token': myToken,
+      'newToken': false,
     });
   }
 }

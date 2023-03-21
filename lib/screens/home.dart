@@ -1,5 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:my_school_rim/widgets/icons.dart';
 
@@ -46,18 +47,24 @@ class _HomeState extends State<Home> {
           icon: const Icon(Icons.close),
         )
       ]),
-      body: Text('nom ${utilisateur.nom}'),
+      body: TextButton(onPressed: () {}, child: Text('Token')),
       drawer: Drawer(
         child: ListView(
           children: [
-            DrawerHeader(padding: const EdgeInsets.only(bottom: 0,top: 6,left: 12,right: 12),
+            DrawerHeader(
+              padding:
+                  const EdgeInsets.only(bottom: 0, top: 6, left: 12, right: 12),
               decoration: BoxDecoration(
                   gradient:
                       LinearGradient(colors: [colorSecondary!, colorPrimary!])),
               child: Stack(children: [
                 Container(
                   alignment: Alignment.bottomCenter,
-                  child: Text(utilisateur.nom,style: const TextStyle(color: Colors.white),),),
+                  child: Text(
+                    utilisateur.nom,
+                    style: const TextStyle(color: Colors.white),
+                  ),
+                ),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: const [
@@ -87,8 +94,8 @@ class _HomeState extends State<Home> {
                   const Divider(),
                   listTile(Icons.account_balance, colorGreen, 'بيانات الحساب',
                       () {
-                    Navigator.pop(context);
-                    Navigator.push(
+                    //Navigator.pop(context);
+                    Navigator.pushReplacement(
                         context,
                         MaterialPageRoute(
                           builder: (context) => Data(utilisateur: utilisateur),
@@ -140,8 +147,14 @@ class _HomeState extends State<Home> {
         .doc(thisUtilisateur.phone)
         .get()
         .then((value) => {
-              thisUtilisateur = Utilisateur(value['nom'], value['phone'],
-                  value['code'], value['ask'], value['answer'])
+              thisUtilisateur = Utilisateur(
+                  value['nom'],
+                  value['phone'],
+                  value['code'],
+                  value['ask'],
+                  value['answer'],
+                  value['token'],
+                  value['newToken'])
             });
   }
 }

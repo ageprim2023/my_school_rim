@@ -3,6 +3,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_dropdown_alert/alert_controller.dart';
 import 'package:flutter_dropdown_alert/model/data_alert.dart';
+import 'package:my_school_rim/main.dart';
 import 'package:my_school_rim/widgets/text_field.dart';
 
 import '../fonctions/fonctions.dart';
@@ -31,6 +32,8 @@ class _LoginState extends State<Login> {
   final answerController = TextEditingController();
   int numPhone = 0;
   bool isForget = false;
+  bool newToken = false;
+  bool enablePhoneController = true;
   final auth = FirebaseAuth.instance;
   bool isShowPassword = false;
   Utilisateur thisUtilisateur = Utilisateur.empty();
@@ -75,7 +78,7 @@ class _LoginState extends State<Login> {
                     ],
                   ),
                 ),
-              )
+              ),
             ],
           ),
         ),
@@ -122,6 +125,7 @@ class _LoginState extends State<Login> {
                         : null,
                   ),
                   MyTextField(
+                    enabled: enablePhoneController,
                     prefix: const MyIcon(icon: Icons.phone),
                     keyboardType: TextInputType.phone,
                     textController: phoneController,
@@ -193,8 +197,30 @@ class _LoginState extends State<Login> {
                 height: 30,
               ),
               Row(
-                mainAxisAlignment: MainAxisAlignment.end,
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
+                  newToken
+                      ? Padding(
+                          padding: const EdgeInsets.only(right: 8.0),
+                          child: TextButton(
+                            onPressed: () {
+                              if (!phoneNumberValidator(phoneController.text)) {
+                                dropdownAlert(
+                                    'الهاتف الشخصي إلزامي', TypeAlert.error);
+                                return;
+                              }
+                              updateEmailsCollection();
+                            },
+                            child: Text(
+                              'تأكيد السماح',
+                              style: TextStyle(
+                                fontSize: 12,
+                                color: colorGreen,
+                              ),
+                            ),
+                          ),
+                        )
+                      : const SizedBox(),
                   Padding(
                     padding: const EdgeInsets.only(left: 8.0),
                     child: TextButton(
@@ -237,8 +263,6 @@ class _LoginState extends State<Login> {
               email: 'agep${phoneController.text}@gmail.com',
               password: '@nrptS${codeController.text}');
       if (userCredential.user != null) {
-        print('ffffffffffffff ${userCredential.user?.getIdToken().toString()}');
-        
         getData();
       }
     } on FirebaseAuthException catch (e) {
@@ -401,18 +425,48 @@ class _LoginState extends State<Login> {
           .doc(phoneController.text)
           .get()
           .then((value) => {
-                thisUtilisateur = Utilisateur(value['nom'], value['phone'],
-                    value['code'], value['ask'], value['answer'])
+                thisUtilisateur = Utilisateur(
+                    value['nom'],
+                    value['phone'],
+                    value['code'],
+                    value['ask'],
+                    value['answer'],
+                    value['token'],
+                    value['newToken'])
               });
-      dropdownAlert('تم الولوج بنجاح', TypeAlert.success);
-      // ignore: use_build_context_synchronously
-      Navigator.pushReplacement(
-          context,
-          MaterialPageRoute(
-            builder: (context) => Home(utilisateur: thisUtilisateur),
-          ));
+      if (thisUtilisateur.token == myToken) {
+        dropdownAlert('تم الولوج بنجاح', TypeAlert.success);
+        // ignore: use_build_context_synchronously
+        Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(
+              builder: (context) => Home(utilisateur: thisUtilisateur),
+            ));
+      } else {
+        dropdownAlert('غير ممكن، لأنكم تحاولون الولوج من هاتف غير هاتفكم',
+            TypeAlert.error);
+        setState(() {
+          isLoading = false;
+          newToken = thisUtilisateur.newToken;
+          enablePhoneController = false;
+        });
+      }
     } catch (e) {
       myShowDialog(context, '$e');
     }
+  }
+
+  updateEmailsCollection() async {
+    CollectionReference collRef =
+        FirebaseFirestore.instance.collection("emails");
+    collRef.doc(phoneController.text).update({
+      'token': myToken,
+      'newToken': false,
+    });
+    setState(() {
+      newToken = false;
+      enablePhoneController = true;
+    });
+    dropdownAlert('أصبح بإمكانكم الآن الولوج من هذا الهاتف', TypeAlert.success);
   }
 }

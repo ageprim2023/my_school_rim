@@ -1,16 +1,21 @@
 class Utilisateur {
-  final String nom;
+  late final String nom;
   final String phone;
-  final String code;
-  final String ask;
-  final String answer;
+  late final String code;
+  late final String ask;
+  late final String answer;
+  final String token;
+  final bool newToken;
 
-  Utilisateur(this.nom, this.phone, this.code, this.ask, this.answer);
+  Utilisateur(this.nom, this.phone, this.code, this.ask, this.answer,
+      this.token, this.newToken);
 
   Utilisateur.empty()
       : nom = '',
         phone = '',
         code = '',
         ask = '',
-        answer = '';
+        answer = '',
+        token = '',
+        newToken = false;
 }

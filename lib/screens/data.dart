@@ -11,12 +11,13 @@ import '../widgets/buttons.dart';
 import '../widgets/container_indicator.dart';
 import '../widgets/icons.dart';
 import '../widgets/pin_put.dart';
+import 'home.dart';
 
 class Data extends StatefulWidget {
   static const root = 'Data';
-  
+
   final Utilisateur utilisateur;
-  
+
   const Data({super.key, required this.utilisateur});
 
   @override
@@ -32,6 +33,7 @@ class _DataState extends State<Data> {
   final answerController = TextEditingController();
   final Utilisateur utilisateur;
   bool isShowPassword = false;
+  late Utilisateur newUtilisateur;
 
   _DataState(this.utilisateur);
 
@@ -48,10 +50,12 @@ class _DataState extends State<Data> {
   @override
   Widget build(BuildContext context) {
     //utilisateur = ModalRoute.of(context)?.settings.arguments as Utilisateur?;
-    
+
     return Scaffold(
       backgroundColor: Colors.white70,
-      appBar: AppBar(),
+      appBar: AppBar(
+        title: Text('تعديل البيانات'),
+      ),
       body: ContainerNormal(
         child: Padding(
           padding: const EdgeInsets.all(6.0),
@@ -62,9 +66,9 @@ class _DataState extends State<Data> {
                 child: Column(
                   children: [
                     Stack(children: [
-                      Image.asset(
-                        'assets/images/appstore.png',
-                        height: 170,
+                      const CircleAvatar(
+                        backgroundImage: AssetImage('assets/images/1234.png'),
+                        radius: 80,
                       ),
                       InkWell(
                         child: const MyIcon(
@@ -166,25 +170,24 @@ class _DataState extends State<Data> {
                             onPressed: () {
                               if (nomController.text.isEmpty) {
                                 dropdownAlert(
-                                    'الاسم الشخصي مطلوب',
-                                    TypeAlert.error);
+                                    'الاسم الشخصي مطلوب', TypeAlert.error);
                                 return;
                               }
-                              if (codeController.text.length<4) {
+                              if (codeController.text.length < 4) {
                                 dropdownAlert(
-                                    'الرمز الشخصي مطلوب',
-                                    TypeAlert.error);
+                                    'الرمز الشخصي مطلوب', TypeAlert.error);
                                 return;
                               }
-                              if (askController.text.isEmpty && answerController.text.isNotEmpty) {
-                                dropdownAlert(
-                                    'يوجد جواب، فماهو السؤال؟',
+                              if (askController.text.isEmpty &&
+                                  answerController.text.isNotEmpty) {
+                                dropdownAlert('يوجد جواب، فماهو السؤال؟',
                                     TypeAlert.error);
                                 return;
                               }
                               if (answerController.text.isEmpty &&
                                   askController.text.isNotEmpty) {
-                                dropdownAlert('يوجد سؤال، فماهو الجواب؟', TypeAlert.error);
+                                dropdownAlert('يوجد سؤال، فماهو الجواب؟',
+                                    TypeAlert.error);
                                 return;
                               }
                               registration();
@@ -214,13 +217,27 @@ class _DataState extends State<Data> {
           .catchError((err) {
         // An error has occured.
       });
-      addEmailToEmailsCollection();
-      Navigator.pop(context);
+      updateEmailsCollection();
+      newUtilisateur = Utilisateur(
+          nomController.text,
+          utilisateur.phone,
+          codeController.text,
+          askController.text,
+          answerController.text,
+          utilisateur.token,
+          utilisateur.newToken);
+      Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(
+            builder: (context) => Home(utilisateur: newUtilisateur),
+          ));
       dropdownAlert('تم الحفظ بنجاح', TypeAlert.success);
-    } catch (r) {}
+    } catch (r) {
+      myShowDialog(context, '$r');
+    }
   }
 
-  addEmailToEmailsCollection() async {
+  updateEmailsCollection() async {
     CollectionReference collRef =
         FirebaseFirestore.instance.collection("emails");
     collRef.doc(phoneController.text).update({
