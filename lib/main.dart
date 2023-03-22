@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
@@ -9,10 +11,42 @@ import 'screens/home.dart';
 import 'screens/login.dart';
 import 'screens/registration.dart';
 import 'tools/styles.dart';
+import 'package:http/http.dart' as http;
 
 var fbm = FirebaseMessaging.instance;
 
 late String myToken;
+
+var serverToken =
+    'AAAAqw41WDs:APA91bFRrseMye96pT3zURSsKZJDho1I1Uk15zRXv-sTkSNoV2tBGaO8DW49KLWUNlHGTqNnCR7sot9l-IJZHK-etjLxZH8VlblJmwm2-ojuqCrkvOJMDqgPbka6CcR3gzVh4K-0hL-c';
+
+sendNotify(String title, String body, String id, String token) async {
+  try {
+    await http.post(
+      Uri.parse('https://api.rnfirebase.io/messaging/send'),
+      headers: <String, String>{
+        'Content-Type': 'application/json; charset=UTF-8',
+        'Authorization': 'key=$serverToken'
+      },
+      body: jsonEncode(<String, dynamic>{
+        'notification': <String, dynamic>{
+          'body': body.toString(),
+          'title': title.toString()
+        },
+        'priority': 'high',
+        'data': <String, dynamic>{
+          'click_action': 'FLUTTER_NOTIFICATION_CLICK',
+          'id': id.toString(),
+          'name': 'Abou Ghaza',
+        },
+        'to': token
+      }),
+    );
+    print('FCM request for device sent!');
+  } catch (e) {
+    print(e);
+  }
+}
 
 getToken() {
   fbm.getToken().then((value) {

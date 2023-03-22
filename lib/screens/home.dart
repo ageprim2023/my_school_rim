@@ -2,9 +2,11 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_dropdown_alert/model/data_alert.dart';
 import 'package:my_school_rim/widgets/icons.dart';
 
 import '../fonctions/fonctions.dart';
+import '../main.dart';
 import '../models/utilisateurs.dart';
 import '../tools/styles.dart';
 import 'data.dart';
@@ -28,6 +30,19 @@ class _HomeState extends State<Home> {
 
   _HomeState(this.utilisateur);
 
+  getMessage() {
+    FirebaseMessaging.onMessage.listen((message) {
+      print('hhhhhhhhhhhhhhhhhhhhhhhhhhhhh');
+      dropdownAlert('${message.notification?.title}', TypeAlert.success);
+    });
+  }
+
+  @override
+  void initState() {
+    getMessage();
+    super.initState();
+  }
+
   @override
   Widget build(BuildContext context) {
     //phoneNumber = ModalRoute.of(context)?.settings.arguments as String;
@@ -47,7 +62,11 @@ class _HomeState extends State<Home> {
           icon: const Icon(Icons.close),
         )
       ]),
-      body: TextButton(onPressed: () {}, child: Text('Token')),
+      body: TextButton(
+          onPressed: () {
+            sendNotify('title', 'body', 'id', myToken);
+          },
+          child: const Text('notif')),
       drawer: Drawer(
         child: ListView(
           children: [
