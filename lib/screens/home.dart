@@ -4,6 +4,7 @@ import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_dropdown_alert/model/data_alert.dart';
 import 'package:my_school_rim/widgets/icons.dart';
+import 'package:my_school_rim/widgets/text_field.dart';
 
 import '../fonctions/fonctions.dart';
 import '../main.dart';
@@ -25,6 +26,8 @@ class Home extends StatefulWidget {
 class _HomeState extends State<Home> {
   final Utilisateur utilisateur;
   late Utilisateur thisUtilisateur;
+  TextEditingController phoneController = TextEditingController();
+  TextEditingController messageController = TextEditingController();
   //late String phoneNumber;
   User? userCurrent = FirebaseAuth.instance.currentUser;
 
@@ -62,11 +65,25 @@ class _HomeState extends State<Home> {
           icon: const Icon(Icons.close),
         )
       ]),
-      body: TextButton(
-          onPressed: () {
-            sendNotify('title', 'body', 'id', myToken);
-          },
-          child: const Text('notif')),
+      body: Column(
+        children: [
+          MyTextField(
+              textController: phoneController,
+              myTitle: 'رقم الهاتف',
+              onChange: (val) {}),
+          MyTextField(
+              textController: messageController,
+              myTitle: 'الرسالة',
+              onChange: (val) {}),
+          TextButton(
+              onPressed: () {
+                thisUtilisateur = Utilisateur.empty();
+                getData();
+                sendNotify('رسالة', messageController.text, 'id', thisUtilisateur.token);
+              },
+              child: const Text('ارسل')),
+        ],
+      ),
       drawer: Drawer(
         child: ListView(
           children: [
@@ -163,7 +180,7 @@ class _HomeState extends State<Home> {
   void getData() async {
     await FirebaseFirestore.instance
         .collection("emails")
-        .doc(thisUtilisateur.phone)
+        .doc(phoneController.text)
         .get()
         .then((value) => {
               thisUtilisateur = Utilisateur(
