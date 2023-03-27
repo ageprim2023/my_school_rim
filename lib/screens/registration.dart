@@ -1,17 +1,16 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_dropdown_alert/model/data_alert.dart';
-import 'package:my_school_rim/fonctions/fonctions.dart';
-import 'package:my_school_rim/widgets/text_field.dart';
 
+import '../fonctions/fonctions.dart';
 import '../main.dart';
 import '../tools/styles.dart';
 import '../widgets/buttons.dart';
 import '../widgets/container_indicator.dart';
 import '../widgets/icons.dart';
 import '../widgets/pin_put.dart';
+import '../widgets/text_field.dart';
 import '../widgets/whats_operator.dart';
 import 'login.dart';
 
@@ -399,7 +398,7 @@ class _RegistrationState extends State<Registration> {
           isLoading = false;
           isRegistrationOK = true;
         });
-        addEmailToEmailsCollection();
+        addCompteDataInEmailsCollection();
       }
     } on FirebaseAuthException catch (e) {
       setState(() {
@@ -420,10 +419,11 @@ class _RegistrationState extends State<Registration> {
     }
   }
 
-  addEmailToEmailsCollection() async {
-    CollectionReference collRef =
-        FirebaseFirestore.instance.collection("emails");
-    collRef.doc(phoneController.text).set({
+  addCompteDataInEmailsCollection() async {
+    FirebaseFirestore.instance
+        .collection("emails")
+        .doc(phoneController.text)
+        .set({
       'nom': nomController.text,
       'phone': phoneController.text,
       'code': codeController.text,

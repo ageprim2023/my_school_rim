@@ -3,16 +3,16 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_dropdown_alert/alert_controller.dart';
 import 'package:flutter_dropdown_alert/model/data_alert.dart';
-import 'package:my_school_rim/main.dart';
-import 'package:my_school_rim/widgets/text_field.dart';
 
 import '../fonctions/fonctions.dart';
+import '../main.dart';
 import '../models/utilisateurs.dart';
 import '../tools/styles.dart';
 import '../widgets/buttons.dart';
 import '../widgets/container_indicator.dart';
 import '../widgets/icons.dart';
 import '../widgets/pin_put.dart';
+import '../widgets/text_field.dart';
 import '../widgets/whats_operator.dart';
 import 'home.dart';
 import 'registration.dart';
@@ -36,7 +36,7 @@ class _LoginState extends State<Login> {
   bool enablePhoneController = true;
   final auth = FirebaseAuth.instance;
   bool isShowPassword = false;
-  Utilisateur thisUtilisateur = Utilisateur.empty();
+  Utilisateur utilisateur = Utilisateur.empty();
 
   @override
   Widget build(BuildContext context) {
@@ -79,6 +79,37 @@ class _LoginState extends State<Login> {
                   ),
                 ),
               ),
+              const SizedBox(
+                height: 14,
+              ),
+              Padding(
+                padding: const EdgeInsets.only(left: 36, right: 36),
+                child: Container(
+                  decoration: BoxDecoration(
+                    //color: colorWhite,
+                    borderRadius: BorderRadius.circular(20),
+                  ),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      IconButton(
+                        onPressed: () {},
+                        icon: MyIcon(
+                            icon: Icons.contact_phone_sharp,
+                            color: colorGreen,
+                            size: 36),
+                      ),
+                      IconButton(
+                        onPressed: () {},
+                        icon: MyIcon(
+                            icon: Icons.whatshot,
+                            color: colorPrimary,
+                            size: 36),
+                      ),
+                    ],
+                  ),
+                ),
+              )
             ],
           ),
         ),
@@ -209,7 +240,7 @@ class _LoginState extends State<Login> {
                                     'الهاتف الشخصي إلزامي', TypeAlert.error);
                                 return;
                               }
-                              updateEmailsCollection();
+                              updateTokenInEmailsCollection();
                             },
                             child: Text(
                               'تأكيد السماح',
@@ -323,10 +354,11 @@ class _LoginState extends State<Login> {
   }
 
   Future getCode() async {
-    DocumentReference doc = FirebaseFirestore.instance
+    await FirebaseFirestore.instance
         .collection("emails")
-        .doc(phoneController.text);
-    await doc.get().then((value) async {
+        .doc(phoneController.text)
+        .get()
+        .then((value) {
       setState(() {
         isLoading = false;
       });
@@ -379,11 +411,11 @@ class _LoginState extends State<Login> {
                     color: colorThird,
                   ),
                 ),
-                MyTextFormField(
-                    labelText: 'فما هو الجواب؟',
-                    controller: answerController,
-                    onChanged: (val) {},
-                    onValidator: (val) {}),
+                MyTextField(
+                  textController: answerController,
+                  myTitle: 'فما هو الجواب؟',
+                  onChange: (val) {},
+                )
               ],
             ),
           ),
@@ -425,7 +457,7 @@ class _LoginState extends State<Login> {
           .doc(phoneController.text)
           .get()
           .then((value) => {
-                thisUtilisateur = Utilisateur(
+                utilisateur = Utilisateur(
                     value['nom'],
                     value['phone'],
                     value['code'],
@@ -434,20 +466,21 @@ class _LoginState extends State<Login> {
                     value['token'],
                     value['newToken'])
               });
-      if (thisUtilisateur.token == myToken) {
-        dropdownAlert('تم الولوج بنجاح', TypeAlert.success);
+      if (utilisateur.token == myToken) {
+        //dropdownAlert('تم الولوج بنجاح', TypeAlert.success);
         // ignore: use_build_context_synchronously
         Navigator.pushReplacement(
             context,
             MaterialPageRoute(
-              builder: (context) => Home(utilisateur: thisUtilisateur),
+              builder: (context) => Home(myUtilisateur: utilisateur),
             ));
       } else {
-        dropdownAlert('غير ممكن، لأنكم تحاولون الولوج من هاتف غير هاتفكم',
+        dropdownAlert(
+            'الولوج غير ممكن، نظرا لأنكم غيرتم هاتفكم، أو قمتم بتهيئته، يرجى الاتصال بالمبرمج',
             TypeAlert.error);
         setState(() {
           isLoading = false;
-          newToken = thisUtilisateur.newToken;
+          newToken = utilisateur.isNewToken;
           enablePhoneController = false;
         });
       }
@@ -456,10 +489,11 @@ class _LoginState extends State<Login> {
     }
   }
 
-  updateEmailsCollection() async {
-    CollectionReference collRef =
-        FirebaseFirestore.instance.collection("emails");
-    collRef.doc(phoneController.text).update({
+  updateTokenInEmailsCollection() async {
+    FirebaseFirestore.instance
+        .collection("emails")
+        .doc(phoneController.text)
+        .update({
       'token': myToken,
       'newToken': false,
     });
