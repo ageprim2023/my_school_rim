@@ -5,6 +5,7 @@ import 'package:flutter_dropdown_alert/model/data_alert.dart';
 import 'package:my_school_rim/models/utilisateurs.dart';
 
 import '../fonctions/fonctions.dart';
+import '../tools/collections.dart';
 import '../tools/styles.dart';
 import '../widgets/buttons.dart';
 import '../widgets/container_indicator.dart';
@@ -272,13 +273,13 @@ class _MyCompteDataState extends State<MyCompteData> {
 
   updateMyComptesDataInEmailsCollection() async {
     FirebaseFirestore.instance
-        .collection("emails")
+        .collection(utilisateursCollection)
         .doc(phoneController.text)
         .update({
-      'nom': nomController.text,
-      'code': codeController.text,
-      'ask': askController.text,
-      'answer': answerController.text,
+      utilisateursCollectionNom: nomController.text,
+      utilisateursCollectionCode: codeController.text,
+      utilisateursCollectionAsk: askController.text,
+      utilisateursCollectionAnswer: answerController.text,
     });
   }
 }

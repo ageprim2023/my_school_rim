@@ -5,6 +5,7 @@ import 'package:flutter_dropdown_alert/model/data_alert.dart';
 
 import '../fonctions/fonctions.dart';
 import '../main.dart';
+import '../tools/collections.dart';
 import '../tools/styles.dart';
 import '../widgets/buttons.dart';
 import '../widgets/container_indicator.dart';
@@ -421,16 +422,16 @@ class _RegistrationState extends State<Registration> {
 
   addCompteDataInEmailsCollection() async {
     FirebaseFirestore.instance
-        .collection("emails")
+        .collection(utilisateursCollection)
         .doc(phoneController.text)
         .set({
-      'nom': nomController.text,
-      'phone': phoneController.text,
-      'code': codeController.text,
-      'ask': askController.text,
-      'answer': answerController.text,
-      'token': myToken,
-      'newToken': false,
+      utilisateursCollectionNom: nomController.text,
+      utilisateursCollectionPhone: phoneController.text,
+      utilisateursCollectionCode: codeController.text,
+      utilisateursCollectionAsk: askController.text,
+      utilisateursCollectionAnswer: answerController.text,
+      utilisateursCollectionToken: myToken,
+      utilisateursCollectionIsNewToken: false,
     });
   }
 }

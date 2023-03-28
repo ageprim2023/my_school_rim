@@ -7,11 +7,11 @@ import 'icons.dart';
 class MyDrawer extends StatelessWidget {
   const MyDrawer({
     super.key,
-    required this.utilisateur,
+    required this.nomUtilisateur,
     required this.listWidges,
   });
 
-  final Utilisateur utilisateur;
+  final String nomUtilisateur;
   final List<Widget> listWidges;
 
   @override
@@ -19,7 +19,7 @@ class MyDrawer extends StatelessWidget {
     return Drawer(
       child: ListView(
         children: [
-          MyDrawerHead(myUtilisateur: utilisateur),
+          MyDrawerHead(nomUtilisateur: nomUtilisateur),
           MyDrawerBody(listWidges: listWidges),
         ],
       ),
@@ -30,10 +30,10 @@ class MyDrawer extends StatelessWidget {
 class MyDrawerHead extends StatelessWidget {
   const MyDrawerHead({
     super.key,
-    required this.myUtilisateur,
+    required this.nomUtilisateur,
   });
 
-  final Utilisateur myUtilisateur;
+  final String nomUtilisateur;
 
   @override
   Widget build(BuildContext context) {
@@ -45,7 +45,7 @@ class MyDrawerHead extends StatelessWidget {
         Container(
           alignment: Alignment.bottomCenter,
           child: Text(
-            myUtilisateur.nom,
+            nomUtilisateur,
             style: const TextStyle(color: Colors.white),
           ),
         ),

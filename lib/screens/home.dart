@@ -5,6 +5,7 @@ import 'package:my_school_rim/models/utilisateurs.dart';
 import '../fonctions/fonctions.dart';
 import '../tools/styles.dart';
 import '../widgets/drawer.dart';
+import 'direction_shcool.dart';
 import 'login.dart';
 import 'my_compte_data.dart';
 
@@ -35,10 +36,13 @@ class _HomeState extends State<Home> {
       ),
       body: const Text('data'),
       drawer: MyDrawer(
-        utilisateur: myUtilisateur,
+        nomUtilisateur: myUtilisateur.nom,
         listWidges: [
           labelTask('المهام', colorThird!),
-          listTile(Icons.school, colorThird, 'إدارة مدرسة', () {}),
+          listTile(Icons.school, colorThird, 'إدارة مدرسة', () {
+            Navigator.pop(context);
+            Navigator.pushNamed(context, DirectionSchool.root);
+          }),
           listTile(Icons.badge, colorPrimary, 'انتساب لمدرسة', () {}),
           listTile(Icons.account_balance, colorGreen, 'بيانات الحساب', () {
             //Navigator.pop(context);

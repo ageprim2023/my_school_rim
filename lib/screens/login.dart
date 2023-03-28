@@ -7,6 +7,7 @@ import 'package:flutter_dropdown_alert/model/data_alert.dart';
 import '../fonctions/fonctions.dart';
 import '../main.dart';
 import '../models/utilisateurs.dart';
+import '../tools/collections.dart';
 import '../tools/styles.dart';
 import '../widgets/buttons.dart';
 import '../widgets/container_indicator.dart';
@@ -453,18 +454,18 @@ class _LoginState extends State<Login> {
   void getData() async {
     try {
       await FirebaseFirestore.instance
-          .collection("emails")
+          .collection(utilisateursCollection)
           .doc(phoneController.text)
           .get()
           .then((value) => {
                 utilisateur = Utilisateur(
-                    value['nom'],
-                    value['phone'],
-                    value['code'],
-                    value['ask'],
-                    value['answer'],
-                    value['token'],
-                    value['newToken'])
+                    value[utilisateursCollectionNom],
+                    value[utilisateursCollectionPhone],
+                    value[utilisateursCollectionCode],
+                    value[utilisateursCollectionAsk],
+                    value[utilisateursCollectionAnswer],
+                    value[utilisateursCollectionToken],
+                    value[utilisateursCollectionIsNewToken])
               });
       if (utilisateur.token == myToken) {
         //dropdownAlert('تم الولوج بنجاح', TypeAlert.success);
@@ -491,11 +492,11 @@ class _LoginState extends State<Login> {
 
   updateTokenInEmailsCollection() async {
     FirebaseFirestore.instance
-        .collection("emails")
+        .collection(utilisateursCollection)
         .doc(phoneController.text)
         .update({
-      'token': myToken,
-      'newToken': false,
+      utilisateursCollectionToken: myToken,
+      utilisateursCollectionIsNewToken: false,
     });
     setState(() {
       newToken = false;
