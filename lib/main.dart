@@ -60,7 +60,8 @@ void main() async {
         Home.root: (context) => Home(myUtilisateur: Utilisateur.empty()),
         MyCompteData.root: (context) =>
             MyCompteData(myUtilisateur: Utilisateur.empty()),
-        DirectionSchool.root: (context) => const DirectionSchool(),
+        DirectionSchool.root: (context) =>
+            DirectionSchool(myUtilisateur: Utilisateur.empty()),
       },
     ),
   );

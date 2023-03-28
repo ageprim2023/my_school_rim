@@ -4,6 +4,7 @@ import 'package:my_school_rim/models/utilisateurs.dart';
 
 import '../fonctions/fonctions.dart';
 import '../tools/styles.dart';
+import '../widgets/alert_dialog.dart';
 import '../widgets/drawer.dart';
 import 'direction_shcool.dart';
 import 'login.dart';
@@ -41,26 +42,39 @@ class _HomeState extends State<Home> {
           labelTask('المهام', colorThird!),
           listTile(Icons.school, colorThird, 'إدارة مدرسة', () {
             Navigator.pop(context);
-            Navigator.pushNamed(context, DirectionSchool.root);
-          }),
-          listTile(Icons.badge, colorPrimary, 'انتساب لمدرسة', () {}),
-          listTile(Icons.account_balance, colorGreen, 'بيانات الحساب', () {
-            //Navigator.pop(context);
-            Navigator.pushReplacement(
+            Navigator.push(
                 context,
                 MaterialPageRoute(
                   builder: (context) =>
-                      MyCompteData(myUtilisateur: myUtilisateur),
+                      DirectionSchool(myUtilisateur: myUtilisateur),
                 ));
           }),
+          listTile(Icons.badge, colorPrimary, 'انتساب لمدرسة', () {}),
+          listTile(Icons.account_balance, colorGreen, 'بيانات الحساب', () {
+            MyAlertDialog(
+                listBody: const [Text('data')],
+                onPressed: () {
+                  Navigator.pushReplacement(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) =>
+                            MyCompteData(myUtilisateur: myUtilisateur),
+                      ));
+                });
+            // //Navigator.pop(context);
+          }),
           listTile(Icons.exit_to_app, colorRed, 'خروج', () {
-            myShowDialogYesNo(context, 'هل تربد حقا غلق التطبيق؟', () async {
-              await FirebaseAuth.instance.signOut();
-              // ignore: use_build_context_synchronously
-              Navigator.pop(context);
-              // ignore: use_build_context_synchronously
-              Navigator.pushReplacementNamed(context, Login.root);
-            });
+            myShowDialogYesNo(
+              context,
+              'هل تربد حقا غلق التطبيق؟',
+              () async {
+                await FirebaseAuth.instance.signOut();
+                // ignore: use_build_context_synchronously
+                Navigator.pop(context);
+                // ignore: use_build_context_synchronously
+                Navigator.pushReplacementNamed(context, Login.root);
+              },
+            );
           }),
         ],
       ),
