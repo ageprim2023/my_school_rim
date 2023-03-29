@@ -103,6 +103,53 @@ Future<void> myShowDialogYesNo(
   );
 }
 
+Future<void> myShowDialogWidgetYesNo(
+  BuildContext context,
+  List<Widget> listBody,
+  VoidCallBack onPressed,
+) async {
+  return showDialog<void>(
+    context: context,
+    barrierDismissible: false, // user must tap button!
+    builder: (BuildContext context) {
+      return AlertDialog(
+        icon:  const MyIcon(icon: Icons.info),
+        content: SingleChildScrollView(
+          child: ListBody(
+            children: listBody,
+          ),
+        ),
+        actions: <Widget>[
+          TextButton(
+            onPressed: onPressed,
+            child: Text(
+              'نعم',
+              style: TextStyle(
+                //fontFamily: 'Amiri',
+                color: colorGreen,
+                fontSize: 20,
+              ),
+            ),
+          ),
+          TextButton(
+            child: Text(
+              'لا',
+              style: TextStyle(
+                //fontFamily: 'Amiri',
+                color: colorRed,
+                fontSize: 20,
+              ),
+            ),
+            onPressed: () {
+              Navigator.of(context).pop();
+            },
+          ),
+        ],
+      );
+    },
+  );
+}
+
 bool isEmail(String email) {
   String p =
       r'^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$';

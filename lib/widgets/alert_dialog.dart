@@ -27,7 +27,6 @@ class MyAlertDialog extends StatelessWidget {
           child: Text(
             'نعم',
             style: TextStyle(
-              //fontFamily: 'Amiri',
               color: colorGreen,
               fontSize: 20,
             ),
@@ -37,7 +36,6 @@ class MyAlertDialog extends StatelessWidget {
           child: Text(
             'لا',
             style: TextStyle(
-              //fontFamily: 'Amiri',
               color: colorRed,
               fontSize: 20,
             ),

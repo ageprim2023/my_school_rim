@@ -10,6 +10,8 @@ import 'direction_shcool.dart';
 import 'login.dart';
 import 'my_compte_data.dart';
 
+enum SingingCharacter { free, paye }
+
 class Home extends StatefulWidget {
   final Utilisateur myUtilisateur;
   static const root = 'Home';
@@ -28,6 +30,8 @@ class _HomeState extends State<Home> {
 
   _HomeState(this.myUtilisateur);
 
+  SingingCharacter? _character = SingingCharacter.free;
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -42,25 +46,63 @@ class _HomeState extends State<Home> {
           labelTask('المهام', colorThird!),
           listTile(Icons.school, colorThird, 'إدارة مدرسة', () {
             Navigator.pop(context);
-            Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) =>
-                      DirectionSchool(myUtilisateur: myUtilisateur),
-                ));
+            myShowDialogWidgetYesNo(
+              context,
+              [
+                Column(
+                  children: [
+                    const Text(
+                      'إدارة مدرسة :',
+                      style:
+                          TextStyle(decoration: TextDecoration.underline),
+                    ),
+                    ListTile(
+                      title: const Text(
+                          'لمدة محددة، مجانية 30 يوما'),
+                      leading: Radio<SingingCharacter>(
+                        value: SingingCharacter.free,
+                        groupValue: _character,
+                        onChanged: (SingingCharacter? value) {
+                          setState(() {
+                            _character = value!;
+                          });
+                        },
+                      ),
+                    ),
+                    ListTile(
+                      title: const Text('لمدة غير محددة، مدفوعة الثمن'),
+                      leading: Radio<SingingCharacter>(
+                        value: SingingCharacter.paye,
+                        groupValue: _character,
+                        onChanged: (SingingCharacter? value) {
+                          setState(() {
+                            _character = value!;
+                          });
+                        },
+                      ),
+                    ),
+                  ],
+                )
+              ],
+              () {
+                Navigator.pop(context);
+                Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) =>
+                          DirectionSchool(myUtilisateur: myUtilisateur),
+                    ));
+              },
+            );
           }),
           listTile(Icons.badge, colorPrimary, 'انتساب لمدرسة', () {}),
           listTile(Icons.account_balance, colorGreen, 'بيانات الحساب', () {
-            MyAlertDialog(
-                listBody: const [Text('data')],
-                onPressed: () {
-                  Navigator.pushReplacement(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) =>
-                            MyCompteData(myUtilisateur: myUtilisateur),
-                      ));
-                });
+            Navigator.pushReplacement(
+                context,
+                MaterialPageRoute(
+                  builder: (context) =>
+                      MyCompteData(myUtilisateur: myUtilisateur),
+                ));
             // //Navigator.pop(context);
           }),
           listTile(Icons.exit_to_app, colorRed, 'خروج', () {
