@@ -16,3 +16,5 @@ const schoolsCollectionAnnee = 'annee';
 const schoolsCollectionAdress = 'adress';
 const schoolsCollectionDir = 'directeur';
 const schoolsCollectionPhone = 'phone';
+const schoolsCollectionDate = 'datevalidation';
+const schoolsCollectionValid = 'isvalidation';

@@ -9,6 +9,6 @@ final colorRed = Colors.red[900];
 final colorGreen = Colors.green[900];
 const colorWhite = Colors.white;
 const colorBlack = Colors.black;
+const colorBrown = Colors.brown;
 const backgroundPrimary = Colors.white70;
 const backgroundSecondary = Colors.white;
-

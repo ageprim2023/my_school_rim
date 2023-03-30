@@ -6,9 +6,11 @@ class School {
   final int numero;
   final int annee;
   final String adresse;
+  final DateTime date;
+  final bool valid;
 
   School(this.nomAr, this.nomFr, this.nomDr, this.phoneDr, this.numero,
-      this.annee, this.adresse);
+      this.annee, this.adresse, this.date, this.valid);
 
   School.empty()
       : nomAr = '',
@@ -17,5 +19,7 @@ class School {
         phoneDr = 0,
         numero = 0,
         annee = 0,
-        adresse = '';
+        adresse = '',
+        date = DateTime.now(),
+        valid = true;
 }
