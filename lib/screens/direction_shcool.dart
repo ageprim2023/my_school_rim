@@ -42,6 +42,7 @@ class _DirectionSchoolState extends State<DirectionSchool> {
   late int myCode;
   SingingCharacter? _character = SingingCharacter.free;
   late DateTime dateValidation;
+  late String freeOrPaye;
 
   getRandom() {
     _character == SingingCharacter.free
@@ -73,7 +74,7 @@ class _DirectionSchoolState extends State<DirectionSchool> {
                   padding: const EdgeInsets.all(12.0),
                   child: saveVisible ? choosingTypeDirection() : null,
                 ),
-                cardData(context),
+                Container(child: !saveVisible ? cardData(context) : null),
               ],
             ),
           ),
@@ -92,6 +93,20 @@ class _DirectionSchoolState extends State<DirectionSchool> {
         padding: const EdgeInsets.only(left: 12, right: 12),
         child: Column(
           children: [
+            _character == SingingCharacter.free
+                ? Text(
+                    textAlign: TextAlign.center,
+                    'هذه النسخة صالحة لغاية\n $dateValidation \n في حال قمتم بإدخال البيانات أسفله والموافقة عليها',
+                    style: TextStyle(color: colorRed),
+                  )
+                : Text(
+                    textAlign: TextAlign.center,
+                    'ينبغي التواصل مع المبرمج لتفعيل هذه النسخة \n في حال قمتم بإدخال البيانات أسفله والموافقة عليها',
+                    style: TextStyle(color: colorGreen),
+                  ),
+            const SizedBox(
+              height: 22,
+            ),
             const Text(
               'بيانات المدرسة',
               style:
@@ -179,43 +194,20 @@ class _DirectionSchoolState extends State<DirectionSchool> {
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                saveVisible
-                    ? MyButton(
-                        minWidth: 140,
-                        title: 'حفظ البيانات',
-                        onPressed: () {
-                          if (nomController.text.isEmpty) {
-                            dropdownAlert('إسم المدرسة مطلوب', TypeAlert.error);
-                            return;
-                          }
-                          setState(() {
-                            isLoading = true;
-                            dateValidation = DateTime.now();
-                            _character == SingingCharacter.free
-                                ? dateValidation = DateTime(
-                                    dateValidation.year,
-                                    dateValidation.month + 1,
-                                    dateValidation.day,
-                                    dateValidation.hour,
-                                    dateValidation.minute,
-                                    dateValidation.second,
-                                  )
-                                : dateValidation = DateTime(
-                                    dateValidation.year + 100,
-                                    dateValidation.month,
-                                    dateValidation.day,
-                                    dateValidation.hour,
-                                    dateValidation.minute,
-                                    dateValidation.second,
-                                  );
-                            _character == SingingCharacter.free
-                                ? isValidation = true
-                                : isValidation = false;
-                          });
-                          getCodeSchool();
-                        },
-                        color: colorGreen!)
-                    : const SizedBox(),
+                MyButton(
+                    minWidth: 140,
+                    title: 'موافقة',
+                    onPressed: () {
+                      if (nomController.text.isEmpty) {
+                        dropdownAlert('إسم المدرسة مطلوب', TypeAlert.error);
+                        return;
+                      }
+                      setState(() {
+                        isLoading = true;
+                      });
+                      getCodeSchool();
+                    },
+                    color: colorGreen!),
                 MyButton(
                     minWidth: 70,
                     title: 'إغلاق',
@@ -228,18 +220,6 @@ class _DirectionSchoolState extends State<DirectionSchool> {
             const SizedBox(
               height: 16,
             ),
-            !saveVisible
-                ? _character == SingingCharacter.free
-                    ? Text(
-                        textAlign: TextAlign.center,
-                        'هذه النسخة صالحة لغاية\n $dateValidation',
-                        style: TextStyle(color: colorRed),
-                      )
-                    : Text(
-                        'ينبغي التواصل مع المبرمج لتفعيل هذه النسخة',
-                        style: TextStyle(color: colorGreen),
-                      )
-                : const SizedBox(),
           ],
         ),
       ),
@@ -253,6 +233,7 @@ class _DirectionSchoolState extends State<DirectionSchool> {
           color: colorForth),
       child: Column(
         children: [
+          const SizedBox(height: 18,),
           const Text(
             'ترغبون في إدارة مدرسة :',
             style: TextStyle(
@@ -262,11 +243,10 @@ class _DirectionSchoolState extends State<DirectionSchool> {
             onTap: () {
               setState(() {
                 _character = SingingCharacter.free;
-                getRandom();
               });
             },
             title: Text(
-              'لمدة محددة، مجانية لمدة 30 يوما.',
+              'لمدة محددة، 30 يوما مجانا.',
               style: TextStyle(
                   color: _character == SingingCharacter.free
                       ? colorGreen
@@ -278,7 +258,6 @@ class _DirectionSchoolState extends State<DirectionSchool> {
               onChanged: (SingingCharacter? value) {
                 setState(() {
                   _character = value!;
-                  getRandom();
                 });
               },
             ),
@@ -287,7 +266,6 @@ class _DirectionSchoolState extends State<DirectionSchool> {
             onTap: () {
               setState(() {
                 _character = SingingCharacter.paye;
-                getRandom();
               });
             },
             title: Text(
@@ -303,11 +281,49 @@ class _DirectionSchoolState extends State<DirectionSchool> {
               onChanged: (SingingCharacter? value) {
                 setState(() {
                   _character = value!;
-                  getRandom();
                 });
               },
             ),
           ),
+          const SizedBox(
+            height: 24,
+          ),
+          MyButton(
+              title: 'تأكيد',
+              onPressed: () {
+                setState(() {
+                  saveVisible = false;
+                  getRandom();
+                  dateValidation = DateTime.now();
+                  _character == SingingCharacter.free
+                      ? dateValidation = DateTime(
+                          dateValidation.year,
+                          dateValidation.month + 1,
+                          dateValidation.day,
+                          dateValidation.hour,
+                          dateValidation.minute,
+                          dateValidation.second,
+                        )
+                      : dateValidation = DateTime(
+                          dateValidation.year + 100,
+                          dateValidation.month,
+                          dateValidation.day,
+                          dateValidation.hour,
+                          dateValidation.minute,
+                          dateValidation.second,
+                        );
+                  _character == SingingCharacter.free
+                      ? isValidation = true
+                      : isValidation = false;
+                  _character == SingingCharacter.free
+                      ? freeOrPaye = 'free'
+                      : freeOrPaye = 'paye';
+                });
+              },
+              color: colorPrimary!),
+          const SizedBox(
+            height: 24,
+          )
         ],
       ),
     );
@@ -330,7 +346,8 @@ class _DirectionSchoolState extends State<DirectionSchool> {
           saveVisible = false;
           isLoading = false;
         });
-        dropdownAlert('تم حفظ البيانات بنجاح', TypeAlert.success);
+        //dropdownAlert('تم حفظ البيانات بنجاح', TypeAlert.success);
+      Navigator.pop(context);
       }
     });
     try {} catch (e) {
@@ -350,9 +367,17 @@ class _DirectionSchoolState extends State<DirectionSchool> {
       schoolsCollectionAnnee: anneeController.text,
       schoolsCollectionAdress: adressController.text,
       schoolsCollectionDir: dirController.text,
-      schoolsCollectionPhone: phoneController.text,
       schoolsCollectionDate: dateValidation,
       schoolsCollectionValid: isValidation,
+      schoolsCollectionFreeOrPaye: freeOrPaye,
     });
+
+    FirebaseFirestore.instance
+        .collection(schoolsCollection)
+        .doc(codeController.text).collection(personsSchoolsCollection)
+        .doc(phoneController.text).set({
+      personsSchoolsCollectionDateInscription: DateTime.now(),
+    });
+        
   }
 }

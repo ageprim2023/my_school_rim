@@ -40,39 +40,79 @@ class _HomeState extends State<Home> {
         title: const Text('الرئيسية'),
       ),
       drawer: getMyDrawer(context),
-      body: StreamBuilder<QuerySnapshot>(
-        stream: FirebaseFirestore.instance
-            .collection(schoolsCollection)
-            .snapshots(),
-        builder: (context, snapshot) {
-          List<Widget> mySchools = [];
-          if (snapshot.hasData) {
-            for (var school in snapshot.data!.docs) {
-              mySchools.add(Padding(
-                padding: const EdgeInsets.only(top: 2, left: 5, right: 5),
-                child: Card(
-                  child: ListTile(
-                    leading: const MyIcon(icon: Icons.school),
-                    title: Text('${school.get(schoolsCollectionNom)}'),
-                    subtitle: Text('${school.get(schoolsCollectionDir)}'),
-                  ),
-                ),
-              ));
-            }
-          }
-          return Stack(
-            children: [
-              ContainerNormal(
-                child: Column(
-                  children: mySchools,
-                ),
-              ),
-              Container(
-                child: !snapshot.hasData ? const ContainerIndicator() : null,
-              )
-            ],
-          );
-        },
+      body: ContainerNormal(
+        alignment: Alignment.topCenter,
+        child: Column(
+          children: [
+            Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: Container(
+                  decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(9),
+                      color: colorWhite),
+                  child: const Padding(
+                    padding: EdgeInsets.all(8.0),
+                    child: Text(
+                      'قائمة مدارسي',
+                      style: TextStyle(
+                          fontSize: 18, decoration: TextDecoration.underline),
+                    ),
+                  )),
+            ),
+            StreamBuilder<QuerySnapshot>(
+              stream: FirebaseFirestore.instance
+                  .collection(schoolsCollection)
+                  .snapshots(),
+              builder: (context, snapshot) {
+                List<Widget> mySchools = [];
+                if (snapshot.hasData) {
+                  for (QueryDocumentSnapshot school in snapshot.data!.docs) {
+                    //String phone = school.get(schoolsCollectionPhone);
+                    String phone = school.reference.collection(personsSchoolsCollection).doc(schoolsCollectionPhone).id;
+                    String free = school.get(schoolsCollectionFreeOrPaye);
+                    if (phone == myUtilisateur.phone) {
+                      mySchools.add(Padding(
+                        padding:
+                            const EdgeInsets.only(left: 5, right: 5),
+                        child: Card(
+                          child: ListTile(
+                            leading: MyIcon(
+                              icon: Icons.school,
+                              color: free != 'free' ? colorGreen : colorRed,
+                            ),
+                            title: Text('${school.get(schoolsCollectionNom)}'),
+                            subtitle: const Text('مدير عام'),
+                            trailing: Text(
+                              'كود\n${school.get(schoolsCollectionCode)}',
+                              style: TextStyle(
+                                fontWeight: FontWeight.bold,
+                                fontSize: 12,
+                                color: colorPrimary
+                              ),
+                            ),
+                          ),
+                        ),
+                      ));
+                    }
+                  }
+                }
+                return Stack(
+                  children: [
+                    ContainerNormal(
+                      child: Column(
+                        children: mySchools,
+                      ),
+                    ),
+                    Container(
+                      child:
+                          !snapshot.hasData ? const ContainerIndicator() : null,
+                    )
+                  ],
+                );
+              },
+            ),
+          ],
+        ),
       ),
     );
   }
@@ -82,7 +122,7 @@ class _HomeState extends State<Home> {
       nomUtilisateur: myUtilisateur.nom,
       listWidges: [
         labelTask('المهام', colorThird!),
-        listTile(Icons.school, colorThird, 'إدارة مدرسة', () {
+        listTile(Icons.manage_accounts, colorPrimary, 'طلب إدارة مدرسة', () {
           Navigator.pop(context);
           Navigator.push(
               context,
@@ -91,8 +131,8 @@ class _HomeState extends State<Home> {
                     DirectionSchool(myUtilisateur: myUtilisateur),
               ));
         }),
-        listTile(Icons.badge, colorPrimary, 'انتساب لمدرسة', () {}),
-        listTile(Icons.account_balance, colorGreen, 'بيانات الحساب', () {
+        listTile(Icons.badge, colorGreen, 'طلب انتساب لمدرسة', () {}),
+        listTile(Icons.account_balance, colorSecondary, 'بيانات الحساب', () {
           Navigator.pushReplacement(
               context,
               MaterialPageRoute(

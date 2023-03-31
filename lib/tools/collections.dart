@@ -18,3 +18,8 @@ const schoolsCollectionDir = 'directeur';
 const schoolsCollectionPhone = 'phone';
 const schoolsCollectionDate = 'datevalidation';
 const schoolsCollectionValid = 'isvalidation';
+const schoolsCollectionFreeOrPaye = 'freeorpaye';
+///**************************************** */
+const personsSchoolsCollection = 'persons';
+const personsSchoolsCollectionDateInscription = 'dateinscription';
+

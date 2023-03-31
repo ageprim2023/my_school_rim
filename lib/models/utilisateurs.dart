@@ -1,9 +1,9 @@
 class Utilisateur {
-  late final String nom;
+   final String nom;
   final String phone;
-  late final String code;
-  late final String ask;
-  late final String answer;
+   final String code;
+   final String ask;
+   final String answer;
   final String token;
   final bool isNewToken;
 
