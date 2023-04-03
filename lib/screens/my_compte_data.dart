@@ -2,9 +2,8 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_dropdown_alert/model/data_alert.dart';
-import 'package:my_school_rim/models/utilisateurs.dart';
-
 import '../fonctions/fonctions.dart';
+import '../models/utilisateurs.dart';
 import '../tools/collections.dart';
 import '../tools/styles.dart';
 import '../widgets/buttons.dart';
@@ -17,6 +16,7 @@ import 'home.dart';
 class MyCompteData extends StatefulWidget {
   static const root = 'MyCompteData';
   final Utilisateur myUtilisateur;
+
   const MyCompteData({super.key, required this.myUtilisateur});
 
   @override
@@ -50,7 +50,7 @@ class _MyCompteDataState extends State<MyCompteData> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        backgroundColor: Colors.white70,
+        backgroundColor: backgroundSecondary,
         appBar: AppBar(
           title: const Text('بيانات الحساب'),
         ),
@@ -242,7 +242,7 @@ class _MyCompteDataState extends State<MyCompteData> {
       final FirebaseAuth firebaseAuth = FirebaseAuth.instance;
       User? currentUser = firebaseAuth.currentUser;
       currentUser?.updatePassword("@nrptS${codeController.text}").then((val) {
-        updateMyComptesDataInEmailsCollection();
+        updateMyComptesDataInUtilisateursCollection();
         utilisateur = Utilisateur(
             nomController.text,
             myUtilisateur.phone,
@@ -272,7 +272,7 @@ class _MyCompteDataState extends State<MyCompteData> {
     }
   }
 
-  updateMyComptesDataInEmailsCollection() async {
+  updateMyComptesDataInUtilisateursCollection() async {
     FirebaseFirestore.instance
         .collection(utilisateursCollection)
         .doc(phoneController.text)

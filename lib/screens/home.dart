@@ -1,21 +1,22 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:my_school_rim/models/utilisateurs.dart';
-import 'package:my_school_rim/widgets/container_indicator.dart';
-import 'package:my_school_rim/widgets/icons.dart';
+import 'package:my_school_rim/tools/styles.dart';
 
 import '../fonctions/fonctions.dart';
+import '../models/utilisateurs.dart';
 import '../tools/collections.dart';
-import '../tools/styles.dart';
+import '../widgets/container_indicator.dart';
 import '../widgets/drawer.dart';
+import '../widgets/icons.dart';
 import 'direction_shcool.dart';
 import 'login.dart';
 import 'my_compte_data.dart';
 
 class Home extends StatefulWidget {
-  final Utilisateur myUtilisateur;
   static const root = 'Home';
+  final Utilisateur myUtilisateur;
+
   const Home({super.key, required this.myUtilisateur});
 
   @override
@@ -33,34 +34,9 @@ class _HomeState extends State<Home> {
 
   late List myListSchools;
 
-  getMySchools() async {
-    try {
-      FirebaseFirestore.instance
-          .collection(utilisateursCollection)
-          //.doc(utilisateursCollectionPhone)
-          .snapshots()
-          .listen((event) {
-        event.docs.forEach((element) {
-          if (element.data()[utilisateursCollectionPhone] ==
-              myUtilisateur.phone) {
-            setState(() {
-              myListSchools = element.data()[utilisateursCollectionScools];
-            });
-            
-          }
-        });
-      });
-    } catch (r) {
-      print("hhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhh");
-      print('object $r');
-      myShowDialog(context, '$r');
-    }
-  }
-
   @override
   void initState() {
     myListSchools = myUtilisateur.schools;
-    getMySchools();
     super.initState();
   }
 
@@ -70,27 +46,15 @@ class _HomeState extends State<Home> {
       backgroundColor: backgroundPrimary,
       appBar: AppBar(
         centerTitle: true,
-        title: const Text('الرئيسية'),
+        title: const Text('قائمة مدارسي'),
       ),
       drawer: getMyDrawer(context),
       body: ContainerNormal(
         alignment: Alignment.topCenter,
         child: Column(
           children: [
-            Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: Container(
-                  decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(9),
-                      color: colorWhite),
-                  child: const Padding(
-                    padding: EdgeInsets.all(8.0),
-                    child: Text(
-                      'قائمة مدارسي',
-                      style: TextStyle(
-                          fontSize: 18, decoration: TextDecoration.underline),
-                    ),
-                  )),
+            const SizedBox(
+              height: 12,
             ),
             StreamBuilder<QuerySnapshot>(
               stream: FirebaseFirestore.instance
@@ -153,7 +117,7 @@ class _HomeState extends State<Home> {
         labelTask('المهام', colorThird!),
         listTile(Icons.manage_accounts, colorPrimary, 'طلب إدارة مدرسة', () {
           Navigator.pop(context);
-          Navigator.push(
+          Navigator.pushReplacement(
               context,
               MaterialPageRoute(
                 builder: (context) =>

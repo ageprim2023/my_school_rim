@@ -1,6 +1,4 @@
 import 'package:flutter/material.dart';
-
-import '../models/utilisateurs.dart';
 import '../tools/styles.dart';
 import 'icons.dart';
 

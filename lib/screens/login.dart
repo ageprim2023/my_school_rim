@@ -42,11 +42,11 @@ class _LoginState extends State<Login> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: backgroundPrimary,
-      appBar: AppBar(
-        title: const Text('صفحة الولوج'),
-        centerTitle: true,
-      ),
+      backgroundColor: backgroundSecondary,
+      // appBar: AppBar(
+      //   title: const Text('صفحة الولوج'),
+      //   centerTitle: true,
+      // ),
       body: Stack(children: <Widget>[
         ContainerNormal(
           child: Column(
@@ -81,7 +81,7 @@ class _LoginState extends State<Login> {
                 ),
               ),
               const SizedBox(
-                height: 14,
+                height: 34,
               ),
               Padding(
                 padding: const EdgeInsets.only(left: 36, right: 36),
@@ -93,17 +93,18 @@ class _LoginState extends State<Login> {
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
+                      const Text('للاتصال بنا'),
+                      const SizedBox(width: 20),
                       IconButton(
                         onPressed: () {},
                         icon: MyIcon(
-                            icon: Icons.contact_phone_sharp,
-                            color: colorGreen,
-                            size: 36),
+                            icon: Icons.phone, color: colorGreen, size: 36),
                       ),
+                      const SizedBox(width: 16),
                       IconButton(
                         onPressed: () {},
                         icon: MyIcon(
-                            icon: Icons.whatshot,
+                            icon: Icons.speaker_phone,
                             color: colorPrimary,
                             size: 36),
                       ),
@@ -125,7 +126,7 @@ class _LoginState extends State<Login> {
     return Padding(
       padding: const EdgeInsets.only(left: 7, right: 7),
       child: Card(
-        elevation: 6,
+        elevation: 0,
         child: Padding(
           padding: const EdgeInsets.only(left: 10, right: 10),
           child: Column(
@@ -241,7 +242,7 @@ class _LoginState extends State<Login> {
                                     'الهاتف الشخصي إلزامي', TypeAlert.error);
                                 return;
                               }
-                              updateTokenInEmailsCollection();
+                              updateTokenInUtilisateursCollection();
                             },
                             child: Text(
                               'تأكيد السماح',
@@ -295,7 +296,7 @@ class _LoginState extends State<Login> {
               email: 'agep${phoneController.text}@gmail.com',
               password: '@nrptS${codeController.text}');
       if (userCredential.user != null) {
-        getData();
+        getDataFromUtilisateursCollection();
       }
     } on FirebaseAuthException catch (e) {
       setState(() {
@@ -451,7 +452,7 @@ class _LoginState extends State<Login> {
     );
   }
 
-  void getData() async {
+  void getDataFromUtilisateursCollection() async {
     try {
       await FirebaseFirestore.instance
           .collection(utilisateursCollection)
@@ -491,7 +492,7 @@ class _LoginState extends State<Login> {
     }
   }
 
-  updateTokenInEmailsCollection() async {
+  updateTokenInUtilisateursCollection() async {
     FirebaseFirestore.instance
         .collection(utilisateursCollection)
         .doc(phoneController.text)

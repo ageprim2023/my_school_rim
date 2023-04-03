@@ -17,6 +17,7 @@ import 'login.dart';
 
 class Registration extends StatefulWidget {
   static const root = 'Registration';
+
   const Registration({super.key});
 
   @override
@@ -37,11 +38,11 @@ class _RegistrationState extends State<Registration> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: backgroundPrimary,
-      appBar: AppBar(
-        title: const Text('فتح حساب'),
-        centerTitle: true,
-      ),
+      backgroundColor: backgroundSecondary,
+      // appBar: AppBar(
+      //   title: const Text('فتح حساب'),
+      //   centerTitle: true,
+      // ),
       body: Stack(children: [
         ContainerNormal(
           child: Column(
@@ -96,7 +97,7 @@ class _RegistrationState extends State<Registration> {
     return Padding(
       padding: const EdgeInsets.only(left: 5, right: 5),
       child: Card(
-        elevation: 6,
+        elevation: 0,
         child: Padding(
           padding: const EdgeInsets.only(left: 10, right: 10),
           child: Column(
@@ -266,7 +267,7 @@ class _RegistrationState extends State<Registration> {
     return Padding(
       padding: const EdgeInsets.only(left: 5, right: 5),
       child: Card(
-        elevation: 6,
+        elevation: 0,
         child: Padding(
           padding: const EdgeInsets.only(left: 5, right: 5),
           child: Column(
@@ -399,7 +400,7 @@ class _RegistrationState extends State<Registration> {
           isLoading = false;
           isRegistrationOK = true;
         });
-        addCompteDataInEmailsCollection();
+        addCompteDataToUtilisateursCollection();
       }
     } on FirebaseAuthException catch (e) {
       setState(() {
@@ -420,7 +421,7 @@ class _RegistrationState extends State<Registration> {
     }
   }
 
-  addCompteDataInEmailsCollection() async {
+  addCompteDataToUtilisateursCollection() async {
     FirebaseFirestore.instance
         .collection(utilisateursCollection)
         .doc(phoneController.text)
@@ -432,7 +433,7 @@ class _RegistrationState extends State<Registration> {
       utilisateursCollectionAnswer: answerController.text,
       utilisateursCollectionToken: myToken,
       utilisateursCollectionIsNewToken: false,
-      utilisateursCollectionScools:['']
+      utilisateursCollectionScools: ['']
     });
   }
 }

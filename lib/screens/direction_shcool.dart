@@ -1,21 +1,23 @@
+import 'dart:math';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_dropdown_alert/model/data_alert.dart';
-import 'package:my_school_rim/fonctions/fonctions.dart';
-import 'package:my_school_rim/models/utilisateurs.dart';
-import 'package:my_school_rim/tools/styles.dart';
-import 'package:my_school_rim/widgets/buttons.dart';
-import 'package:my_school_rim/widgets/container_indicator.dart';
-import 'package:my_school_rim/widgets/text_field.dart';
-import 'dart:math';
+import 'package:my_school_rim/screens/home.dart';
 
+import '../fonctions/fonctions.dart';
+import '../models/utilisateurs.dart';
 import '../tools/collections.dart';
+import '../tools/styles.dart';
+import '../widgets/buttons.dart';
+import '../widgets/container_indicator.dart';
+import '../widgets/text_field.dart';
 
 enum SingingCharacter { free, paye }
 
 class DirectionSchool extends StatefulWidget {
-  final Utilisateur myUtilisateur;
   static const root = 'DirectionSchool';
+  final Utilisateur myUtilisateur;
   const DirectionSchool({super.key, required this.myUtilisateur});
 
   @override
@@ -37,23 +39,18 @@ class _DirectionSchoolState extends State<DirectionSchool> {
   TextEditingController dirController = TextEditingController();
   TextEditingController phoneController = TextEditingController();
 
-  _DirectionSchoolState(this.myUtilisateur);
-
   late int myCode;
-  SingingCharacter? _character = SingingCharacter.free;
+  late SingingCharacter character;
   late DateTime dateValidation;
   late String freeOrPaye;
   late List mySchools;
+  late Utilisateur utilisateur;
 
-  getRandom() {
-    _character == SingingCharacter.free
-        ? myCode = Random().nextInt(2000) + 1000
-        : myCode = Random().nextInt(2000) + 8000;
-    codeController.text = '$myCode';
-  }
+  _DirectionSchoolState(this.myUtilisateur);
 
   @override
   void initState() {
+    character = SingingCharacter.free;
     dirController.text = myUtilisateur.nom;
     phoneController.text = myUtilisateur.phone;
     mySchools = myUtilisateur.schools;
@@ -63,7 +60,7 @@ class _DirectionSchoolState extends State<DirectionSchool> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: backgroundPrimary,
+      backgroundColor: backgroundSecondary,
       appBar: AppBar(title: const Text('إدارة مدرسة'), centerTitle: true),
       body: Stack(
         children: [
@@ -94,7 +91,7 @@ class _DirectionSchoolState extends State<DirectionSchool> {
         padding: const EdgeInsets.only(left: 12, right: 12),
         child: Column(
           children: [
-            _character == SingingCharacter.free
+            character == SingingCharacter.free
                 ? Text(
                     textAlign: TextAlign.center,
                     'هذه النسخة صالحة لغاية\n $dateValidation \n في حال قمتم بإدخال البيانات أسفله والموافقة عليها',
@@ -206,7 +203,7 @@ class _DirectionSchoolState extends State<DirectionSchool> {
                       setState(() {
                         isLoading = true;
                       });
-                      getCodeSchool();
+                      getCodeSchoolFromSchoolsCollection();
                     },
                     color: colorGreen!),
                 MyButton(
@@ -245,22 +242,22 @@ class _DirectionSchoolState extends State<DirectionSchool> {
           ListTile(
             onTap: () {
               setState(() {
-                _character = SingingCharacter.free;
+                character = SingingCharacter.free;
               });
             },
             title: Text(
               'لمدة محددة، 30 يوما مجانا.',
               style: TextStyle(
-                  color: _character == SingingCharacter.free
+                  color: character == SingingCharacter.free
                       ? colorGreen
                       : colorBlack),
             ),
             leading: Radio<SingingCharacter>(
               value: SingingCharacter.free,
-              groupValue: _character,
+              groupValue: character,
               onChanged: (SingingCharacter? value) {
                 setState(() {
-                  _character = value!;
+                  character = value!;
                 });
               },
             ),
@@ -268,22 +265,22 @@ class _DirectionSchoolState extends State<DirectionSchool> {
           ListTile(
             onTap: () {
               setState(() {
-                _character = SingingCharacter.paye;
+                character = SingingCharacter.paye;
               });
             },
             title: Text(
               'لمدة غير محددة، مدفوعة الثمن.',
               style: TextStyle(
-                  color: _character == SingingCharacter.paye
+                  color: character == SingingCharacter.paye
                       ? colorGreen
                       : colorBlack),
             ),
             leading: Radio<SingingCharacter>(
               value: SingingCharacter.paye,
-              groupValue: _character,
+              groupValue: character,
               onChanged: (SingingCharacter? value) {
                 setState(() {
-                  _character = value!;
+                  character = value!;
                 });
               },
             ),
@@ -298,7 +295,7 @@ class _DirectionSchoolState extends State<DirectionSchool> {
                   saveVisible = false;
                   getRandom();
                   dateValidation = DateTime.now();
-                  _character == SingingCharacter.free
+                  character == SingingCharacter.free
                       ? dateValidation = DateTime(
                           dateValidation.year,
                           dateValidation.month + 1,
@@ -315,10 +312,10 @@ class _DirectionSchoolState extends State<DirectionSchool> {
                           dateValidation.minute,
                           dateValidation.second,
                         );
-                  _character == SingingCharacter.free
+                  character == SingingCharacter.free
                       ? isValidation = true
                       : isValidation = false;
-                  _character == SingingCharacter.free
+                  character == SingingCharacter.free
                       ? freeOrPaye = 'free'
                       : freeOrPaye = 'paye';
                 });
@@ -332,7 +329,14 @@ class _DirectionSchoolState extends State<DirectionSchool> {
     );
   }
 
-  getCodeSchool() async {
+  getRandom() {
+    character == SingingCharacter.free
+        ? myCode = Random().nextInt(2000) + 1000
+        : myCode = Random().nextInt(2000) + 8000;
+    codeController.text = '$myCode';
+  }
+
+  getCodeSchoolFromSchoolsCollection() async {
     await FirebaseFirestore.instance
         .collection(schoolsCollection)
         .doc('$myCode')
@@ -342,17 +346,29 @@ class _DirectionSchoolState extends State<DirectionSchool> {
         setState(() {
           getRandom();
         });
-        getCodeSchool();
+        getCodeSchoolFromSchoolsCollection();
       } else {
         addSchoolDataInSchoolCollection();
         mySchools.add(codeController.text);
-        updateSchoolsInEmailsCollection();
+        updateSchoolsInUtilisateursCollection();
         setState(() {
           saveVisible = false;
           isLoading = false;
         });
-        //dropdownAlert('تم حفظ البيانات بنجاح', TypeAlert.success);
-        Navigator.pop(context);
+        utilisateur = Utilisateur(
+            myUtilisateur.nom,
+            myUtilisateur.phone,
+            myUtilisateur.code,
+            myUtilisateur.ask,
+            myUtilisateur.answer,
+            myUtilisateur.token,
+            myUtilisateur.isNewToken,
+            mySchools);
+        Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(
+              builder: (context) => Home(myUtilisateur: utilisateur),
+            ));
       }
     });
     try {} catch (e) {
@@ -377,7 +393,7 @@ class _DirectionSchoolState extends State<DirectionSchool> {
     });
   }
 
-  updateSchoolsInEmailsCollection() async {
+  updateSchoolsInUtilisateursCollection() async {
     FirebaseFirestore.instance
         .collection(utilisateursCollection)
         .doc(phoneController.text)
