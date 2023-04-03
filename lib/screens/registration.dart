@@ -432,6 +432,7 @@ class _RegistrationState extends State<Registration> {
       utilisateursCollectionAnswer: answerController.text,
       utilisateursCollectionToken: myToken,
       utilisateursCollectionIsNewToken: false,
+      utilisateursCollectionScools:['']
     });
   }
 }

@@ -31,6 +31,39 @@ class _HomeState extends State<Home> {
 
   _HomeState(this.myUtilisateur);
 
+  late List myListSchools;
+
+  getMySchools() async {
+    try {
+      FirebaseFirestore.instance
+          .collection(utilisateursCollection)
+          //.doc(utilisateursCollectionPhone)
+          .snapshots()
+          .listen((event) {
+        event.docs.forEach((element) {
+          if (element.data()[utilisateursCollectionPhone] ==
+              myUtilisateur.phone) {
+            setState(() {
+              myListSchools = element.data()[utilisateursCollectionScools];
+            });
+            
+          }
+        });
+      });
+    } catch (r) {
+      print("hhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhh");
+      print('object $r');
+      myShowDialog(context, '$r');
+    }
+  }
+
+  @override
+  void initState() {
+    myListSchools = myUtilisateur.schools;
+    getMySchools();
+    super.initState();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -62,38 +95,34 @@ class _HomeState extends State<Home> {
             StreamBuilder<QuerySnapshot>(
               stream: FirebaseFirestore.instance
                   .collection(schoolsCollection)
+                  .where(schoolsCollectionCode, whereIn: myListSchools)
+                  //.orderBy(schoolsCollectionNom)
                   .snapshots(),
               builder: (context, snapshot) {
                 List<Widget> mySchools = [];
                 if (snapshot.hasData) {
                   for (QueryDocumentSnapshot school in snapshot.data!.docs) {
-                    //String phone = school.get(schoolsCollectionPhone);
-                    String phone = school.reference.collection(personsSchoolsCollection).doc(schoolsCollectionPhone).id;
                     String free = school.get(schoolsCollectionFreeOrPaye);
-                    if (phone == myUtilisateur.phone) {
-                      mySchools.add(Padding(
-                        padding:
-                            const EdgeInsets.only(left: 5, right: 5),
-                        child: Card(
-                          child: ListTile(
-                            leading: MyIcon(
-                              icon: Icons.school,
-                              color: free != 'free' ? colorGreen : colorRed,
-                            ),
-                            title: Text('${school.get(schoolsCollectionNom)}'),
-                            subtitle: const Text('مدير عام'),
-                            trailing: Text(
-                              'كود\n${school.get(schoolsCollectionCode)}',
-                              style: TextStyle(
+                    mySchools.add(Padding(
+                      padding: const EdgeInsets.only(left: 5, right: 5),
+                      child: Card(
+                        child: ListTile(
+                          leading: MyIcon(
+                            icon: Icons.school,
+                            color: free != 'free' ? colorGreen : colorRed,
+                          ),
+                          title: Text('${school.get(schoolsCollectionNom)}'),
+                          subtitle: const Text('مدير عام'),
+                          trailing: Text(
+                            'كود\n${school.get(schoolsCollectionCode)}',
+                            style: TextStyle(
                                 fontWeight: FontWeight.bold,
                                 fontSize: 12,
-                                color: colorPrimary
-                              ),
-                            ),
+                                color: colorPrimary),
                           ),
                         ),
-                      ));
-                    }
+                      ),
+                    ));
                   }
                 }
                 return Stack(

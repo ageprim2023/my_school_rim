@@ -250,7 +250,8 @@ class _MyCompteDataState extends State<MyCompteData> {
             askController.text,
             answerController.text,
             myUtilisateur.token,
-            myUtilisateur.isNewToken);
+            myUtilisateur.isNewToken,
+            myUtilisateur.schools);
         Navigator.pushReplacement(
             context,
             MaterialPageRoute(

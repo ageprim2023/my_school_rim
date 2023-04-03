@@ -6,6 +6,8 @@ const utilisateursCollectionAsk = 'ask';
 const utilisateursCollectionAnswer = 'answer';
 const utilisateursCollectionToken = 'token';
 const utilisateursCollectionIsNewToken = 'isNewToken';
+const utilisateursCollectionScools = 'schools';
+
 
 ///**************************************** */
 const schoolsCollection = 'schools';
@@ -14,12 +16,7 @@ const schoolsCollectionCode = 'code';
 const schoolsCollectionNum = 'numero';
 const schoolsCollectionAnnee = 'annee';
 const schoolsCollectionAdress = 'adress';
-const schoolsCollectionDir = 'directeur';
-const schoolsCollectionPhone = 'phone';
 const schoolsCollectionDate = 'datevalidation';
 const schoolsCollectionValid = 'isvalidation';
 const schoolsCollectionFreeOrPaye = 'freeorpaye';
-///**************************************** */
-const personsSchoolsCollection = 'persons';
-const personsSchoolsCollectionDateInscription = 'dateinscription';
 

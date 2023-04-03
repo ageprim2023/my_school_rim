@@ -43,6 +43,7 @@ class _DirectionSchoolState extends State<DirectionSchool> {
   SingingCharacter? _character = SingingCharacter.free;
   late DateTime dateValidation;
   late String freeOrPaye;
+  late List mySchools;
 
   getRandom() {
     _character == SingingCharacter.free
@@ -53,9 +54,9 @@ class _DirectionSchoolState extends State<DirectionSchool> {
 
   @override
   void initState() {
-    getRandom();
     dirController.text = myUtilisateur.nom;
     phoneController.text = myUtilisateur.phone;
+    mySchools = myUtilisateur.schools;
     super.initState();
   }
 
@@ -233,7 +234,9 @@ class _DirectionSchoolState extends State<DirectionSchool> {
           color: colorForth),
       child: Column(
         children: [
-          const SizedBox(height: 18,),
+          const SizedBox(
+            height: 18,
+          ),
           const Text(
             'ترغبون في إدارة مدرسة :',
             style: TextStyle(
@@ -342,12 +345,14 @@ class _DirectionSchoolState extends State<DirectionSchool> {
         getCodeSchool();
       } else {
         addSchoolDataInSchoolCollection();
+        mySchools.add(codeController.text);
+        updateSchoolsInEmailsCollection();
         setState(() {
           saveVisible = false;
           isLoading = false;
         });
         //dropdownAlert('تم حفظ البيانات بنجاح', TypeAlert.success);
-      Navigator.pop(context);
+        Navigator.pop(context);
       }
     });
     try {} catch (e) {
@@ -366,18 +371,18 @@ class _DirectionSchoolState extends State<DirectionSchool> {
       schoolsCollectionNum: numController.text,
       schoolsCollectionAnnee: anneeController.text,
       schoolsCollectionAdress: adressController.text,
-      schoolsCollectionDir: dirController.text,
       schoolsCollectionDate: dateValidation,
       schoolsCollectionValid: isValidation,
       schoolsCollectionFreeOrPaye: freeOrPaye,
     });
+  }
 
+  updateSchoolsInEmailsCollection() async {
     FirebaseFirestore.instance
-        .collection(schoolsCollection)
-        .doc(codeController.text).collection(personsSchoolsCollection)
-        .doc(phoneController.text).set({
-      personsSchoolsCollectionDateInscription: DateTime.now(),
+        .collection(utilisateursCollection)
+        .doc(phoneController.text)
+        .update({
+      utilisateursCollectionScools: mySchools,
     });
-        
   }
 }

@@ -6,9 +6,10 @@ class Utilisateur {
    final String answer;
   final String token;
   final bool isNewToken;
+  final List schools;
 
   Utilisateur(this.nom, this.phone, this.code, this.ask, this.answer,
-      this.token, this.isNewToken);
+      this.token, this.isNewToken, this.schools);
 
   Utilisateur.empty()
       : nom = '',
@@ -16,6 +17,7 @@ class Utilisateur {
         code = '',
         ask = '',
         answer = '',
+        schools = [],
         token = '',
         isNewToken = false;
 }

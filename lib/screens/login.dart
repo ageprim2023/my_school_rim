@@ -465,7 +465,8 @@ class _LoginState extends State<Login> {
                     value[utilisateursCollectionAsk],
                     value[utilisateursCollectionAnswer],
                     value[utilisateursCollectionToken],
-                    value[utilisateursCollectionIsNewToken])
+                    value[utilisateursCollectionIsNewToken],
+                    value[utilisateursCollectionScools])
               });
       if (utilisateur.token == myToken) {
         //dropdownAlert('تم الولوج بنجاح', TypeAlert.success);
